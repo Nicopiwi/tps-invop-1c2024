@@ -2,6 +2,7 @@ import sys
 #importamos el modulo cplex
 import cplex
 from recordclass import recordclass
+import numpy as np
 
 TOLERANCE =10e-6 
 Orden = recordclass('Orden', 'id beneficio cant_trab')
@@ -15,6 +16,12 @@ class InstanciaAsignacionCuadrillas:
         self.ordenes_correlativas = []
         self.ordenes_conflictivas = []
         self.ordenes_repetitivas = []
+        self._indices_A_ijd = [] # 6 * T * O variables
+        self._indices_B_idk = [] # 30 * O variables
+        self._indices_TR_id = [] # 6 * T variables
+        self._indices_delta_j = [] # O variables
+        self._indices_x_ir = [] # 4 * T variables
+        self._indices_w_ir = [] # 3 * T variables
         
     def leer_datos(self,nombre_archivo):
 
@@ -26,7 +33,24 @@ class InstanciaAsignacionCuadrillas:
         
         # Lectura cantidad de ordenes
         self.cantidad_ordenes = int(f.readline())
-        
+
+        # Precalculo de indices
+
+        indice_comienzo = 0
+        self._indices_A_ijd = np.arange(
+             6 * self.cantidad_trabajadores * self.cantidad_ordenes
+        ).reshape(self.cantidad_trabajadores, self.cantidad_ordenes, 6).tolist()
+        indice_comienzo += 6 * self.cantidad_trabajadores * self.cantidad_ordenes
+        self._indices_B_idk = (np.arange(self.cantidad_ordenes * 6 * 5).reshape(self.cantidad_ordenes, 6, 5) + indice_comienzo).tolist()
+        indice_comienzo += self.cantidad_ordenes * 6 * 5
+        self._indices_TR_id = (np.arange(self.cantidad_trabajadores * 6).reshape(self.cantidad_trabajadores, 6) + indice_comienzo).tolist()
+        indice_comienzo += self.cantidad_trabajadores * 6
+        self._indices_delta_j = (np.arange(self.cantidad_ordenes) + indice_comienzo).tolist()
+        indice_comienzo += self.cantidad_ordenes
+        self._indices_x_ir = (np.arange(self.cantidad_trabajadores * 4).reshape(self.cantidad_trabajadores, 4) + indice_comienzo).tolist()
+        indice_comienzo += self.cantidad_trabajadores * 4
+        self._indices_w_ir = (np.arange(self.cantidad_trabajadores * 3).reshape(self.cantidad_trabajadores, 3) + indice_comienzo).tolist()
+
         # Lectura de las ordenes
         self.ordenes = []
         for i in range(self.cantidad_ordenes):
