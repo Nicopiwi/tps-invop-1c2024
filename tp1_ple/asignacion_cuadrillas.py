@@ -203,6 +203,9 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Orden {j} a lo sumo un turno (i)")
 
+
+    print(filas, senses, rhs, names)
+
     for j in range(instancia.cantidad_ordenes):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[:, j, :], newshape=-1).tolist()
         indices.append(instancia._indices_delta_j[j])
@@ -212,6 +215,8 @@ def agregar_restricciones(prob, instancia):
         senses.append('E')
         rhs.append(0)
         names.append(f"Orden {j} a lo sumo un turno (ii)")
+
+
 
     for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[i, :, d], newshape=-1).tolist()
@@ -277,13 +282,12 @@ def agregar_restricciones(prob, instancia):
         senses.append('L')
         rhs.append(0)
         names.append(f"Si {j1} en {k}, entonces {j2} en {k+1}")
-    
 
     for (i1, i2) in itertools.combinations(range(instancia.cantidad_trabajadores), 2):
         indices_1 = np.reshape(np.array(instancia._indices_A_ijd)[i1, :, :], newshape=-1)
         indices_2 = np.reshape(np.array(instancia._indices_A_ijd)[i2, :, :], newshape=-1)
-        indices = np.concatenate([indices_1, indices_2])
-        valores = [1] * instancia.cantidad_ordenes + [-1] * instancia.cantidad_ordenes
+        indices = np.concatenate([indices_1, indices_2]).tolist()
+        valores = [1] * instancia.cantidad_ordenes * 6 + [-1] * instancia.cantidad_ordenes * 6
 
         fila = [indices,valores]
         filas.append(fila)
@@ -296,8 +300,9 @@ def agregar_restricciones(prob, instancia):
         senses.append('G')
         rhs.append(-8)
         names.append(f"No puede haber una diferencia mayor a 8 turnos entre los trabajadores {i1} y {i2}")
-
+    
     prob.linear_constraints.add(lin_expr=filas, senses=senses, rhs=rhs, names=names)
+
 
 def armar_lp(prob, instancia):
 
