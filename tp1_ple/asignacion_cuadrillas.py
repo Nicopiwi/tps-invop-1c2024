@@ -18,7 +18,7 @@ class InstanciaAsignacionCuadrillas:
         self.ordenes_conflictivas = []
         self.ordenes_repetitivas = []
         self._indices_A_ijd = [] # 6 * T * O variables
-        self._indices_B_idk = [] # 30 * O variables
+        self._indices_B_jdk = [] # 30 * O variables
         self._indices_TR_id = [] # 6 * T variables
         self._indices_delta_j = [] # O variables
         self._indices_x_ir = [] # 4 * T variables
@@ -43,7 +43,7 @@ class InstanciaAsignacionCuadrillas:
              6 * self.cantidad_trabajadores * self.cantidad_ordenes
         ).reshape(self.cantidad_trabajadores, self.cantidad_ordenes, 6).tolist()
         indice_comienzo += 6 * self.cantidad_trabajadores * self.cantidad_ordenes
-        self._indices_B_idk = (
+        self._indices_B_jdk = (
             np.arange(self.cantidad_ordenes * 6 * 5)
                 .reshape(self.cantidad_ordenes, 6, 5) + indice_comienzo
             ).tolist()
@@ -64,12 +64,7 @@ class InstanciaAsignacionCuadrillas:
             np.arange(self.cantidad_trabajadores * 3)
             .reshape(self.cantidad_trabajadores, 3) + indice_comienzo
         ).tolist()
-        self._total_variables = 6 * self.cantidad_trabajadores * self.cantidad_ordenes 
-        + 6 * 5 * self.cantidad_ordenes 
-        + 6 * self.cantidad_trabajadores 
-        + self.cantidad_ordenes 
-        + 4 * self.cantidad_trabajadores 
-        + 3 * self.cantidad_trabajadores
+        self._total_variables = indice_comienzo + self.cantidad_trabajadores * 3
 
         # Lectura de las ordenes
         self.ordenes = []
@@ -130,16 +125,18 @@ def agregar_variables(prob, instancia):
     # Llenar coef\_funcion\_objetivo
     coeficientes_funcion_objetivo = [0]*instancia._total_variables
 
+    print(instancia._total_variables)
     # Llenar coeficientes_funcion_objetivo con los beneficios de las ordenes
     for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
-        coeficientes_funcion_objetivo[instancia._indices_B_jdk[j][d][k]] = instancia.ordenes[j].beneficio
+        #print(j, d, k, instancia._indices_B_jdk[j][d][k])
+        coeficientes_funcion_objetivo[instancia._indices_B_jdk[j][d][k]] = int(instancia.ordenes[j].beneficio)
 
     # Llenar coeficientes_funcion_objetivo con los costos de las ordenes
     for i in range(instancia.cantidad_trabajadores):
-        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1000
-        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1200
-        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1400
-        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1500
+        coeficientes_funcion_objetivo[instancia._indices_x_ir[i][0]] = -1000
+        coeficientes_funcion_objetivo[instancia._indices_x_ir[i][1]] = -1200
+        coeficientes_funcion_objetivo[instancia._indices_x_ir[i][2]] = -1400
+        coeficientes_funcion_objetivo[instancia._indices_x_ir[i][3]] = -1500
 
     # Ponemos nombre a las variables
     nombres = [""] * instancia._total_variables
@@ -173,7 +170,7 @@ def agregar_variables(prob, instancia):
 
     for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(4)):
         types[instancia._indices_x_ir[i][r]] = "I"
-    
+
     # Agregar las variables
     prob.variables.add(obj = coeficientes_funcion_objetivo, lb = lb, ub = ub, types=types, names=nombres)
 
@@ -197,44 +194,44 @@ def agregar_restricciones(prob, instancia):
     names = []
 
     for j in range(instancia.cantidad_ordenes):
-        indices = np.reshape(instancia._indices_B_jdk[j, :, :], newshape=-1).tolist()
+        indices = np.reshape(instancia._indices_B_jdk[j], newshape=-1).tolist()
         indices.append(instancia._indices_delta_j[j])
         valores = [1] * (6 * 5) + [-1]
         fila = [indices,valores]
         filas.append(fila)
         senses.append('E')
         rhs.append(0)
-        names.append("Orden {j} a lo sumo un turno (i)".format(j))
+        names.append(f"Orden {j} a lo sumo un turno (i)")
 
     for j in range(instancia.cantidad_ordenes):
-        indices = np.reshape(instancia._indices_A_ijd[:, j, :], newshape=-1).tolist()
+        indices = np.reshape(np.array(instancia._indices_A_ijd)[:, j, :], newshape=-1).tolist()
         indices.append(instancia._indices_delta_j[j])
-        valores = [1] * (6 * instancia.cantidad_trabajadores) + [-instancia.ordenes[j].cant_trab]
+        valores = [1] * (6 * instancia.cantidad_trabajadores) + [-int(instancia.ordenes[j].cant_trab)]
         fila = [indices,valores]
         filas.append(fila)
         senses.append('E')
         rhs.append(0)
-        names.append("Orden {j} a lo sumo un turno (ii)".format(j))
+        names.append(f"Orden {j} a lo sumo un turno (ii)")
 
     for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
-        indices = np.reshape(instancia._indices_A_ijd[i, :, d], newshape=-1).tolist()
-        indices.append(instancia._indices_TR_id[i, d])
+        indices = np.reshape(np.array(instancia._indices_A_ijd)[i, :, d], newshape=-1).tolist()
+        indices.append(instancia._indices_TR_id[i][d])
         valores = [1] * instancia.cantidad_ordenes + [-4]
         fila = [indices,valores]
         filas.append(fila)
         senses.append('L')
         rhs.append(0)
-        names.append("Trabajador {i} no trabaja los 5 turnos".format(i))
+        names.append(f"Trabajador {i} no trabaja los 5 turnos")
 
     for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
-        indices = np.reshape(instancia._indices_A_ijd[i, :, d], newshape=-1).tolist()
-        indices.append(instancia._indices_TR_id[i, d])
+        indices = np.reshape(np.array(instancia._indices_A_ijd)[i, :, d], newshape=-1).tolist()
+        indices.append(instancia._indices_TR_id[i][d])
         valores = [1] * instancia.cantidad_ordenes + [-1]
         fila = [indices,valores]
         filas.append(fila)
         senses.append('G')
         rhs.append(0)
-        names.append("Activacion Tr_{i}_{d}".format(i))
+        names.append(f"Activacion Tr_{i}_{d}")
 
     for i in range(instancia.cantidad_trabajadores):
         indices = instancia._indices_TR_id[i]
@@ -243,14 +240,14 @@ def agregar_restricciones(prob, instancia):
         filas.append(fila)
         senses.append('L')
         rhs.append(5)
-        names.append("Trabajador {i} no trabaja todos los dias".format(i))
+        names.append(f"Trabajador {i} no trabaja todos los dias")
 
     # Ordenes conflictivas
     for (j1, j2), i, d, k in itertools.product(
         instancia.ordenes_conflictivas, 
         range(instancia.cantidad_trabajadores), 
         range(6), 
-        range(5)
+        range(4) # No considerar ultimo turno
     ):
         indices = [
             instancia._indices_A_ijd[i][j1][d], 
@@ -263,12 +260,12 @@ def agregar_restricciones(prob, instancia):
         filas.append(fila)
         senses.append('L')
         rhs.append(3)
-        names.append("Ordenes {j1} y {j2} no pueden ser asignadas al mismo trabajador consecutivamente".format(j1, j2))
+        names.append(f"Ordenes {j1} y {j2} no pueden ser asignadas al mismo trabajador consecutivamente")
 
     for (j1, j2), d, k in itertools.product(
         instancia.ordenes_correlativas, 
         range(6), 
-        range(5)
+        range(4)
     ):
         indices = [
             instancia._indices_B_jdk[j1][d][k],
@@ -280,10 +277,11 @@ def agregar_restricciones(prob, instancia):
         senses.append('L')
         rhs.append(0)
         names.append(f"Si {j1} en {k}, entonces {j2} en {k+1}")
+    
 
     for (i1, i2) in itertools.combinations(range(instancia.cantidad_trabajadores), 2):
-        indices_1 = np.reshape(instancia._indices_A_ijd[i1, :, :], newshape=-1)
-        indices_2 = np.reshape(instancia._indices_A_ijd[i2, :, :], newshape=-1)
+        indices_1 = np.reshape(np.array(instancia._indices_A_ijd)[i1, :, :], newshape=-1)
+        indices_2 = np.reshape(np.array(instancia._indices_A_ijd)[i2, :, :], newshape=-1)
         indices = np.concatenate([indices_1, indices_2])
         valores = [1] * instancia.cantidad_ordenes + [-1] * instancia.cantidad_ordenes
 
@@ -310,7 +308,7 @@ def armar_lp(prob, instancia):
     agregar_restricciones(prob, instancia)
 
     # Setear el sentido del problema
-    prob.objective.set_sense(prob.objective.sense.....)
+    # prob.objective.set_sense(prob.objective.sense.....)
 
     # Escribir el lp a archivo
     prob.write('asignacionCuadrillas.lp')
