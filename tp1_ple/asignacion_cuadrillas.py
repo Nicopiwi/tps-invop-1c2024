@@ -43,16 +43,33 @@ class InstanciaAsignacionCuadrillas:
              6 * self.cantidad_trabajadores * self.cantidad_ordenes
         ).reshape(self.cantidad_trabajadores, self.cantidad_ordenes, 6).tolist()
         indice_comienzo += 6 * self.cantidad_trabajadores * self.cantidad_ordenes
-        self._indices_B_idk = (np.arange(self.cantidad_ordenes * 6 * 5).reshape(self.cantidad_ordenes, 6, 5) + indice_comienzo).tolist()
+        self._indices_B_idk = (
+            np.arange(self.cantidad_ordenes * 6 * 5)
+                .reshape(self.cantidad_ordenes, 6, 5) + indice_comienzo
+            ).tolist()
         indice_comienzo += self.cantidad_ordenes * 6 * 5
-        self._indices_TR_id = (np.arange(self.cantidad_trabajadores * 6).reshape(self.cantidad_trabajadores, 6) + indice_comienzo).tolist()
+        self._indices_TR_id = (
+            np.arange(self.cantidad_trabajadores * 6)
+            .reshape(self.cantidad_trabajadores, 6) + indice_comienzo
+        ).tolist()
         indice_comienzo += self.cantidad_trabajadores * 6
         self._indices_delta_j = (np.arange(self.cantidad_ordenes) + indice_comienzo).tolist()
         indice_comienzo += self.cantidad_ordenes
-        self._indices_x_ir = (np.arange(self.cantidad_trabajadores * 4).reshape(self.cantidad_trabajadores, 4) + indice_comienzo).tolist()
+        self._indices_x_ir = (
+            np.arange(self.cantidad_trabajadores * 4)
+            .reshape(self.cantidad_trabajadores, 4) + indice_comienzo
+        ).tolist()
         indice_comienzo += self.cantidad_trabajadores * 4
-        self._indices_w_ir = (np.arange(self.cantidad_trabajadores * 3).reshape(self.cantidad_trabajadores, 3) + indice_comienzo).tolist()
-        self._total_variables = 6 * self.cantidad_trabajadores * self.cantidad_ordenes + 5 * self.cantidad_ordenes + 6 * self.cantidad_trabajadores + self.cantidad_ordenes + 4 * self.cantidad_trabajadores + 3 * self.cantidad_trabajadores
+        self._indices_w_ir = (
+            np.arange(self.cantidad_trabajadores * 3)
+            .reshape(self.cantidad_trabajadores, 3) + indice_comienzo
+        ).tolist()
+        self._total_variables = 6 * self.cantidad_trabajadores * self.cantidad_ordenes 
+        + 6 * 5 * self.cantidad_ordenes 
+        + 6 * self.cantidad_trabajadores 
+        + self.cantidad_ordenes 
+        + 4 * self.cantidad_trabajadores 
+        + 3 * self.cantidad_trabajadores
 
         # Lectura de las ordenes
         self.ordenes = []
@@ -155,7 +172,7 @@ def agregar_variables(prob, instancia):
     types = ["B"] * instancia._total_variables
 
     for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(4)):
-        types[instancia._indices_x_ir[0][0]] = "I"
+        types[instancia._indices_x_ir[i][r]] = "I"
     
     # Agregar las variables
     prob.variables.add(obj = coeficientes_funcion_objetivo, lb = lb, ub = ub, types=types, names=nombres)
@@ -174,10 +191,115 @@ def agregar_restricciones(prob, instancia):
     # elemento.
 
     # Restriccion generica
-    indices = ...
-    valores = ...
-    fila = [indices,valores]
-    prob.linear_constraints.add(lin_expr=[fila], senses=[...], rhs=[...], names=[...])
+    filas = []
+    senses = []
+    rhs = []
+    names = []
+
+    for j in range(instancia.cantidad_ordenes):
+        indices = np.reshape(instancia._indices_B_jdk[j, :, :], newshape=-1).tolist()
+        indices.append(instancia._indices_delta_j[j])
+        valores = [1] * (6 * 5) + [-1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('E')
+        rhs.append(0)
+        names.append("Orden {j} a lo sumo un turno (i)".format(j))
+
+    for j in range(instancia.cantidad_ordenes):
+        indices = np.reshape(instancia._indices_A_ijd[:, j, :], newshape=-1).tolist()
+        indices.append(instancia._indices_delta_j[j])
+        valores = [1] * (6 * instancia.cantidad_trabajadores) + [-instancia.ordenes[j].cant_trab]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('E')
+        rhs.append(0)
+        names.append("Orden {j} a lo sumo un turno (ii)".format(j))
+
+    for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
+        indices = np.reshape(instancia._indices_A_ijd[i, :, d], newshape=-1).tolist()
+        indices.append(instancia._indices_TR_id[i, d])
+        valores = [1] * instancia.cantidad_ordenes + [-4]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append("Trabajador {i} no trabaja los 5 turnos".format(i))
+
+    for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
+        indices = np.reshape(instancia._indices_A_ijd[i, :, d], newshape=-1).tolist()
+        indices.append(instancia._indices_TR_id[i, d])
+        valores = [1] * instancia.cantidad_ordenes + [-1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('G')
+        rhs.append(0)
+        names.append("Activacion Tr_{i}_{d}".format(i))
+
+    for i in range(instancia.cantidad_trabajadores):
+        indices = instancia._indices_TR_id[i]
+        valores = [1] * 6
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(5)
+        names.append("Trabajador {i} no trabaja todos los dias".format(i))
+
+    # Ordenes conflictivas
+    for (j1, j2), i, d, k in itertools.product(
+        instancia.ordenes_conflictivas, 
+        range(instancia.cantidad_trabajadores), 
+        range(6), 
+        range(5)
+    ):
+        indices = [
+            instancia._indices_A_ijd[i][j1][d], 
+            instancia._indices_B_jdk[j1][d][k],
+            instancia._indices_A_ijd[i][j2][d],
+            instancia._indices_B_jdk[j2][d][k+1]
+        ]
+        valores = [1, 1, 1, 1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(3)
+        names.append("Ordenes {j1} y {j2} no pueden ser asignadas al mismo trabajador consecutivamente".format(j1, j2))
+
+    for (j1, j2), d, k in itertools.product(
+        instancia.ordenes_correlativas, 
+        range(6), 
+        range(5)
+    ):
+        indices = [
+            instancia._indices_B_jdk[j1][d][k],
+            instancia._indices_B_jdk[j2][d][k+1]
+        ]
+        valores = [1, -1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append(f"Si {j1} en {k}, entonces {j2} en {k+1}")
+
+    for (i1, i2) in itertools.combinations(range(instancia.cantidad_trabajadores), 2):
+        indices_1 = np.reshape(instancia._indices_A_ijd[i1, :, :], newshape=-1)
+        indices_2 = np.reshape(instancia._indices_A_ijd[i2, :, :], newshape=-1)
+        indices = np.concatenate([indices_1, indices_2])
+        valores = [1] * instancia.cantidad_ordenes + [-1] * instancia.cantidad_ordenes
+
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(8)
+        names.append(f"No puede haber una diferencia mayor a 8 turnos entre los trabajadores {i1} y {i2}")
+
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('G')
+        rhs.append(-8)
+        names.append(f"No puede haber una diferencia mayor a 8 turnos entre los trabajadores {i1} y {i2}")
+
+    prob.linear_constraints.add(lin_expr=filas, senses=senses, rhs=rhs, names=names)
 
 def armar_lp(prob, instancia):
 
@@ -196,7 +318,7 @@ def armar_lp(prob, instancia):
 def resolver_lp(prob):
     
     # Definir los parametros del solver
-    prob.parameters....
+    # prob.parameters....
        
     # Resolver el lp
     prob.solve()
@@ -215,7 +337,7 @@ def resolver_lp(prob):
     # Tomar los valores de las variables
     x  = prob.solution.get_values()
     # Mostrar las variables con valor positivo (mayor que una tolerancia)
-    .....
+    print(x)
 
 def main():
     
@@ -232,7 +354,7 @@ def main():
     resolver_lp(prob)
 
     # Obtencion de la solucion
-    mostrar_solucion(prob,instancia)
+    # mostrar_solucion(prob,instancia)
 
 if __name__ == '__main__':
     main()
