@@ -3,6 +3,7 @@ import sys
 import cplex
 from recordclass import recordclass
 import numpy as np
+import itertools
 
 TOLERANCE =10e-6 
 Orden = recordclass('Orden', 'id beneficio cant_trab')
@@ -22,6 +23,7 @@ class InstanciaAsignacionCuadrillas:
         self._indices_delta_j = [] # O variables
         self._indices_x_ir = [] # 4 * T variables
         self._indices_w_ir = [] # 3 * T variables
+        self._total_variables = 0
         
     def leer_datos(self,nombre_archivo):
 
@@ -50,6 +52,7 @@ class InstanciaAsignacionCuadrillas:
         self._indices_x_ir = (np.arange(self.cantidad_trabajadores * 4).reshape(self.cantidad_trabajadores, 4) + indice_comienzo).tolist()
         indice_comienzo += self.cantidad_trabajadores * 4
         self._indices_w_ir = (np.arange(self.cantidad_trabajadores * 3).reshape(self.cantidad_trabajadores, 3) + indice_comienzo).tolist()
+        self._total_variables = 6 * self.cantidad_trabajadores * self.cantidad_ordenes + 5 * self.cantidad_ordenes + 6 * self.cantidad_trabajadores + self.cantidad_ordenes + 4 * self.cantidad_trabajadores + 3 * self.cantidad_trabajadores
 
         # Lectura de las ordenes
         self.ordenes = []
@@ -107,22 +110,55 @@ def cargar_instancia():
     return instancia
 
 def agregar_variables(prob, instancia):
-    # Definir y agregar las variables:
-	# metodo 'add' de 'variables', con parametros:
-	# obj: costos de la funcion objetivo
-	# lb: cotas inferiores
-    # ub: cotas superiores
-    # types: tipo de las variables
-    # names: nombre (como van a aparecer en el archivo .lp)
-	
     # Llenar coef\_funcion\_objetivo
-    coeficientes_funcion_objetivo = ....
+    coeficientes_funcion_objetivo = [0]*instancia._total_variables
 
-    # Poner nombre a las variables
-    nombres = ....
+    # Llenar coeficientes_funcion_objetivo con los beneficios de las ordenes
+    for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
+        coeficientes_funcion_objetivo[instancia._indices_B_jdk[j][d][k]] = instancia.ordenes[j].beneficio
+
+    # Llenar coeficientes_funcion_objetivo con los costos de las ordenes
+    for i in range(instancia.cantidad_trabajadores):
+        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1000
+        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1200
+        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1400
+        coeficientes_funcion_objetivo[instancia._indices_x_it[i][0]] = -1500
+
+    # Ponemos nombre a las variables
+    nombres = [""] * instancia._total_variables
+
+    for i, j, d in itertools.product(range(instancia.cantidad_trabajadores), range(instancia.cantidad_ordenes), range(6)):
+        nombres[instancia._indices_A_ijd[i][j][d]] = "A_{}_{}_{}".format(i, j, d)
+    
+    for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
+        nombres[instancia._indices_B_jdk[j][d][k]] = "B_{}_{}_{}".format(j, d, k)
+    
+    for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
+        nombres[instancia._indices_TR_id[i][d]] = "TR_{}_{}".format(i, d)
+    
+    for j in range(instancia.cantidad_ordenes):
+        nombres[instancia._indices_delta_j[j]] = "delta_{}".format(j)
+
+    for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(4)):
+        nombres[instancia._indices_x_ir[i][r]] = "x_{}_{}".format(i, r)
+    
+    for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(3)):
+        nombres[instancia._indices_w_ir[i][r]] = "w_{}_{}".format(i, r)
+    
+    lb = [0] * instancia._total_variables
+    ub = [1] * instancia._total_variables
+
+    for i in range(instancia.cantidad_trabajadores):
+        for r in range(4):
+            ub[instancia._indices_x_ir[i][r]] = instancia.cantidad_ordenes
+    
+    types = ["B"] * instancia._total_variables
+
+    for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(4)):
+        types[instancia._indices_x_ir[0][0]] = "I"
     
     # Agregar las variables
-    prob.variables.add(obj = coeficientes_funcion_objetivo, lb = ...., ub = ...., types=...., names=nombres)
+    prob.variables.add(obj = coeficientes_funcion_objetivo, lb = lb, ub = ub, types=types, names=nombres)
 
 def agregar_restricciones(prob, instancia):
     # Agregar las restricciones ax <= (>= ==) b:
