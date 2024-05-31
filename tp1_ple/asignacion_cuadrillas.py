@@ -300,6 +300,74 @@ def agregar_restricciones(prob, instancia):
         senses.append('G')
         rhs.append(-8)
         names.append(f"No puede haber una diferencia mayor a 8 turnos entre los trabajadores {i1} y {i2}")
+
+    for i in range(instancia.cantidad_trabajadores):
+        indices = np.concatenate([
+            np.reshape(np.array(instancia._indices_A_ijd)[i, :, :], newshape=-1),
+            np.array(instancia._indices_x_ir)[i, :]
+        ]).tolist()
+        valores = [1] * instancia.cantidad_ordenes * 6 + [-1] * 4
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('E')
+        rhs.append(0)
+        names.append(f"Restriccion de la cantidad de turnos para el trabajador {i}")
+
+        indices = [instancia._indices_x_ir[i][0], instancia._indices_w_ir[i][0]]
+        valores = [1, -5]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('G')
+        rhs.append(0)
+        names.append(f"Restriccion primer tramo funcion de costo trabajador (i) {i}")
+
+        indices = [instancia._indices_x_ir[i][0]]
+        valores = [1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(5)
+        names.append(f"Restriccion primer tramo funcion de costo trabajador (ii) {i}")
+
+        indices = [instancia._indices_x_ir[i][1], instancia._indices_w_ir[i][1]]
+        valores = [1, -5]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('G')
+        rhs.append(0)
+        names.append(f"Restriccion segundo tramo funcion de costo trabajador (i) {i}")
+
+        indices = [instancia._indices_x_ir[i][1], instancia._indices_w_ir[i][0]]
+        valores = [1, -5]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append(f"Restriccion segundo tramo funcion de costo trabajador (ii) {i}")
+
+        indices = [instancia._indices_x_ir[i][2], instancia._indices_w_ir[i][2]]
+        valores = [1, -5]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('G')
+        rhs.append(0)
+        names.append(f"Restriccion tercer tramo funcion de costo trabajador (i) {i}")
+
+        indices = [instancia._indices_x_ir[i][2], instancia._indices_w_ir[i][1]]
+        valores = [1, -5]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append(f"Restriccion tercer tramo funcion de costo trabajador (ii) {i}")
+        
+        indices = [instancia._indices_x_ir[i][3], instancia._indices_w_ir[i][2]]
+        valores = [1, -5]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append(f"Restriccion cuarto tramo funcion de costo trabajador {i}")
     
     prob.linear_constraints.add(lin_expr=filas, senses=senses, rhs=rhs, names=names)
 

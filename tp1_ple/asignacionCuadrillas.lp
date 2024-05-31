@@ -64,13 +64,6 @@ Minimize
        - 1200 x_11_1 - 1400 x_11_2 - 1500 x_11_3 - 1000 x_12_0 - 1200 x_12_1
        - 1400 x_12_2 - 1500 x_12_3 - 1000 x_13_0 - 1200 x_13_1 - 1400 x_13_2
        - 1500 x_13_3 - 1000 x_14_0 - 1200 x_14_1 - 1400 x_14_2 - 1500 x_14_3
-       + 0 w_0_0 + 0 w_0_1 + 0 w_0_2 + 0 w_1_0 + 0 w_1_1 + 0 w_1_2 + 0 w_2_0
-       + 0 w_2_1 + 0 w_2_2 + 0 w_3_0 + 0 w_3_1 + 0 w_3_2 + 0 w_4_0 + 0 w_4_1
-       + 0 w_4_2 + 0 w_5_0 + 0 w_5_1 + 0 w_5_2 + 0 w_6_0 + 0 w_6_1 + 0 w_6_2
-       + 0 w_7_0 + 0 w_7_1 + 0 w_7_2 + 0 w_8_0 + 0 w_8_1 + 0 w_8_2 + 0 w_9_0
-       + 0 w_9_1 + 0 w_9_2 + 0 w_10_0 + 0 w_10_1 + 0 w_10_2 + 0 w_11_0
-       + 0 w_11_1 + 0 w_11_2 + 0 w_12_0 + 0 w_12_1 + 0 w_12_2 + 0 w_13_0
-       + 0 w_13_1 + 0 w_13_2 + 0 w_14_0 + 0 w_14_1 + 0 w_14_2
 Subject To
  Orden_0_a_lo_sumo_un_turno_(i)#0: B_0_0_0 + B_0_0_1 + B_0_0_2 + B_0_0_3
                                  + B_0_0_4 + B_0_1_0 + B_0_1_1 + B_0_1_2
@@ -9796,6 +9789,456 @@ Subject To
                                  - A_14_8_4 - A_14_8_5 - A_14_9_0 - A_14_9_1
                                  - A_14_9_2 - A_14_9_3 - A_14_9_4 - A_14_9_5
                                  >= -8
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_0#1529: A_0_0_0
+                                 + A_0_0_1 + A_0_0_2 + A_0_0_3 + A_0_0_4
+                                 + A_0_0_5 + A_0_1_0 + A_0_1_1 + A_0_1_2
+                                 + A_0_1_3 + A_0_1_4 + A_0_1_5 + A_0_2_0
+                                 + A_0_2_1 + A_0_2_2 + A_0_2_3 + A_0_2_4
+                                 + A_0_2_5 + A_0_3_0 + A_0_3_1 + A_0_3_2
+                                 + A_0_3_3 + A_0_3_4 + A_0_3_5 + A_0_4_0
+                                 + A_0_4_1 + A_0_4_2 + A_0_4_3 + A_0_4_4
+                                 + A_0_4_5 + A_0_5_0 + A_0_5_1 + A_0_5_2
+                                 + A_0_5_3 + A_0_5_4 + A_0_5_5 + A_0_6_0
+                                 + A_0_6_1 + A_0_6_2 + A_0_6_3 + A_0_6_4
+                                 + A_0_6_5 + A_0_7_0 + A_0_7_1 + A_0_7_2
+                                 + A_0_7_3 + A_0_7_4 + A_0_7_5 + A_0_8_0
+                                 + A_0_8_1 + A_0_8_2 + A_0_8_3 + A_0_8_4
+                                 + A_0_8_5 + A_0_9_0 + A_0_9_1 + A_0_9_2
+                                 + A_0_9_3 + A_0_9_4 + A_0_9_5 - x_0_0 - x_0_1
+                                 - x_0_2 - x_0_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_0#1530: x_0_0
+                                 - 5 w_0_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_0#1531: x_0_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_0#1532: x_0_1
+                                 - 5 w_0_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_0#1533: x_0_1
+                                 - 5 w_0_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_0#1534: x_0_2
+                                 - 5 w_0_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_0#1535: x_0_2
+                                 - 5 w_0_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_0#1536: x_0_3 - 5 w_0_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_1#1537: A_1_0_0
+                                 + A_1_0_1 + A_1_0_2 + A_1_0_3 + A_1_0_4
+                                 + A_1_0_5 + A_1_1_0 + A_1_1_1 + A_1_1_2
+                                 + A_1_1_3 + A_1_1_4 + A_1_1_5 + A_1_2_0
+                                 + A_1_2_1 + A_1_2_2 + A_1_2_3 + A_1_2_4
+                                 + A_1_2_5 + A_1_3_0 + A_1_3_1 + A_1_3_2
+                                 + A_1_3_3 + A_1_3_4 + A_1_3_5 + A_1_4_0
+                                 + A_1_4_1 + A_1_4_2 + A_1_4_3 + A_1_4_4
+                                 + A_1_4_5 + A_1_5_0 + A_1_5_1 + A_1_5_2
+                                 + A_1_5_3 + A_1_5_4 + A_1_5_5 + A_1_6_0
+                                 + A_1_6_1 + A_1_6_2 + A_1_6_3 + A_1_6_4
+                                 + A_1_6_5 + A_1_7_0 + A_1_7_1 + A_1_7_2
+                                 + A_1_7_3 + A_1_7_4 + A_1_7_5 + A_1_8_0
+                                 + A_1_8_1 + A_1_8_2 + A_1_8_3 + A_1_8_4
+                                 + A_1_8_5 + A_1_9_0 + A_1_9_1 + A_1_9_2
+                                 + A_1_9_3 + A_1_9_4 + A_1_9_5 - x_1_0 - x_1_1
+                                 - x_1_2 - x_1_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_1#1538: x_1_0
+                                 - 5 w_1_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_1#1539: x_1_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_1#1540: x_1_1
+                                 - 5 w_1_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_1#1541: x_1_1
+                                 - 5 w_1_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_1#1542: x_1_2
+                                 - 5 w_1_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_1#1543: x_1_2
+                                 - 5 w_1_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_1#1544: x_1_3 - 5 w_1_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_2#1545: A_2_0_0
+                                 + A_2_0_1 + A_2_0_2 + A_2_0_3 + A_2_0_4
+                                 + A_2_0_5 + A_2_1_0 + A_2_1_1 + A_2_1_2
+                                 + A_2_1_3 + A_2_1_4 + A_2_1_5 + A_2_2_0
+                                 + A_2_2_1 + A_2_2_2 + A_2_2_3 + A_2_2_4
+                                 + A_2_2_5 + A_2_3_0 + A_2_3_1 + A_2_3_2
+                                 + A_2_3_3 + A_2_3_4 + A_2_3_5 + A_2_4_0
+                                 + A_2_4_1 + A_2_4_2 + A_2_4_3 + A_2_4_4
+                                 + A_2_4_5 + A_2_5_0 + A_2_5_1 + A_2_5_2
+                                 + A_2_5_3 + A_2_5_4 + A_2_5_5 + A_2_6_0
+                                 + A_2_6_1 + A_2_6_2 + A_2_6_3 + A_2_6_4
+                                 + A_2_6_5 + A_2_7_0 + A_2_7_1 + A_2_7_2
+                                 + A_2_7_3 + A_2_7_4 + A_2_7_5 + A_2_8_0
+                                 + A_2_8_1 + A_2_8_2 + A_2_8_3 + A_2_8_4
+                                 + A_2_8_5 + A_2_9_0 + A_2_9_1 + A_2_9_2
+                                 + A_2_9_3 + A_2_9_4 + A_2_9_5 - x_2_0 - x_2_1
+                                 - x_2_2 - x_2_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_2#1546: x_2_0
+                                 - 5 w_2_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_2#1547: x_2_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_2#1548: x_2_1
+                                 - 5 w_2_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_2#1549: x_2_1
+                                 - 5 w_2_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_2#1550: x_2_2
+                                 - 5 w_2_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_2#1551: x_2_2
+                                 - 5 w_2_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_2#1552: x_2_3 - 5 w_2_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_3#1553: A_3_0_0
+                                 + A_3_0_1 + A_3_0_2 + A_3_0_3 + A_3_0_4
+                                 + A_3_0_5 + A_3_1_0 + A_3_1_1 + A_3_1_2
+                                 + A_3_1_3 + A_3_1_4 + A_3_1_5 + A_3_2_0
+                                 + A_3_2_1 + A_3_2_2 + A_3_2_3 + A_3_2_4
+                                 + A_3_2_5 + A_3_3_0 + A_3_3_1 + A_3_3_2
+                                 + A_3_3_3 + A_3_3_4 + A_3_3_5 + A_3_4_0
+                                 + A_3_4_1 + A_3_4_2 + A_3_4_3 + A_3_4_4
+                                 + A_3_4_5 + A_3_5_0 + A_3_5_1 + A_3_5_2
+                                 + A_3_5_3 + A_3_5_4 + A_3_5_5 + A_3_6_0
+                                 + A_3_6_1 + A_3_6_2 + A_3_6_3 + A_3_6_4
+                                 + A_3_6_5 + A_3_7_0 + A_3_7_1 + A_3_7_2
+                                 + A_3_7_3 + A_3_7_4 + A_3_7_5 + A_3_8_0
+                                 + A_3_8_1 + A_3_8_2 + A_3_8_3 + A_3_8_4
+                                 + A_3_8_5 + A_3_9_0 + A_3_9_1 + A_3_9_2
+                                 + A_3_9_3 + A_3_9_4 + A_3_9_5 - x_3_0 - x_3_1
+                                 - x_3_2 - x_3_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_3#1554: x_3_0
+                                 - 5 w_3_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_3#1555: x_3_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_3#1556: x_3_1
+                                 - 5 w_3_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_3#1557: x_3_1
+                                 - 5 w_3_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_3#1558: x_3_2
+                                 - 5 w_3_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_3#1559: x_3_2
+                                 - 5 w_3_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_3#1560: x_3_3 - 5 w_3_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_4#1561: A_4_0_0
+                                 + A_4_0_1 + A_4_0_2 + A_4_0_3 + A_4_0_4
+                                 + A_4_0_5 + A_4_1_0 + A_4_1_1 + A_4_1_2
+                                 + A_4_1_3 + A_4_1_4 + A_4_1_5 + A_4_2_0
+                                 + A_4_2_1 + A_4_2_2 + A_4_2_3 + A_4_2_4
+                                 + A_4_2_5 + A_4_3_0 + A_4_3_1 + A_4_3_2
+                                 + A_4_3_3 + A_4_3_4 + A_4_3_5 + A_4_4_0
+                                 + A_4_4_1 + A_4_4_2 + A_4_4_3 + A_4_4_4
+                                 + A_4_4_5 + A_4_5_0 + A_4_5_1 + A_4_5_2
+                                 + A_4_5_3 + A_4_5_4 + A_4_5_5 + A_4_6_0
+                                 + A_4_6_1 + A_4_6_2 + A_4_6_3 + A_4_6_4
+                                 + A_4_6_5 + A_4_7_0 + A_4_7_1 + A_4_7_2
+                                 + A_4_7_3 + A_4_7_4 + A_4_7_5 + A_4_8_0
+                                 + A_4_8_1 + A_4_8_2 + A_4_8_3 + A_4_8_4
+                                 + A_4_8_5 + A_4_9_0 + A_4_9_1 + A_4_9_2
+                                 + A_4_9_3 + A_4_9_4 + A_4_9_5 - x_4_0 - x_4_1
+                                 - x_4_2 - x_4_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_4#1562: x_4_0
+                                 - 5 w_4_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_4#1563: x_4_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_4#1564: x_4_1
+                                 - 5 w_4_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_4#1565: x_4_1
+                                 - 5 w_4_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_4#1566: x_4_2
+                                 - 5 w_4_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_4#1567: x_4_2
+                                 - 5 w_4_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_4#1568: x_4_3 - 5 w_4_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_5#1569: A_5_0_0
+                                 + A_5_0_1 + A_5_0_2 + A_5_0_3 + A_5_0_4
+                                 + A_5_0_5 + A_5_1_0 + A_5_1_1 + A_5_1_2
+                                 + A_5_1_3 + A_5_1_4 + A_5_1_5 + A_5_2_0
+                                 + A_5_2_1 + A_5_2_2 + A_5_2_3 + A_5_2_4
+                                 + A_5_2_5 + A_5_3_0 + A_5_3_1 + A_5_3_2
+                                 + A_5_3_3 + A_5_3_4 + A_5_3_5 + A_5_4_0
+                                 + A_5_4_1 + A_5_4_2 + A_5_4_3 + A_5_4_4
+                                 + A_5_4_5 + A_5_5_0 + A_5_5_1 + A_5_5_2
+                                 + A_5_5_3 + A_5_5_4 + A_5_5_5 + A_5_6_0
+                                 + A_5_6_1 + A_5_6_2 + A_5_6_3 + A_5_6_4
+                                 + A_5_6_5 + A_5_7_0 + A_5_7_1 + A_5_7_2
+                                 + A_5_7_3 + A_5_7_4 + A_5_7_5 + A_5_8_0
+                                 + A_5_8_1 + A_5_8_2 + A_5_8_3 + A_5_8_4
+                                 + A_5_8_5 + A_5_9_0 + A_5_9_1 + A_5_9_2
+                                 + A_5_9_3 + A_5_9_4 + A_5_9_5 - x_5_0 - x_5_1
+                                 - x_5_2 - x_5_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_5#1570: x_5_0
+                                 - 5 w_5_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_5#1571: x_5_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_5#1572: x_5_1
+                                 - 5 w_5_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_5#1573: x_5_1
+                                 - 5 w_5_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_5#1574: x_5_2
+                                 - 5 w_5_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_5#1575: x_5_2
+                                 - 5 w_5_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_5#1576: x_5_3 - 5 w_5_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_6#1577: A_6_0_0
+                                 + A_6_0_1 + A_6_0_2 + A_6_0_3 + A_6_0_4
+                                 + A_6_0_5 + A_6_1_0 + A_6_1_1 + A_6_1_2
+                                 + A_6_1_3 + A_6_1_4 + A_6_1_5 + A_6_2_0
+                                 + A_6_2_1 + A_6_2_2 + A_6_2_3 + A_6_2_4
+                                 + A_6_2_5 + A_6_3_0 + A_6_3_1 + A_6_3_2
+                                 + A_6_3_3 + A_6_3_4 + A_6_3_5 + A_6_4_0
+                                 + A_6_4_1 + A_6_4_2 + A_6_4_3 + A_6_4_4
+                                 + A_6_4_5 + A_6_5_0 + A_6_5_1 + A_6_5_2
+                                 + A_6_5_3 + A_6_5_4 + A_6_5_5 + A_6_6_0
+                                 + A_6_6_1 + A_6_6_2 + A_6_6_3 + A_6_6_4
+                                 + A_6_6_5 + A_6_7_0 + A_6_7_1 + A_6_7_2
+                                 + A_6_7_3 + A_6_7_4 + A_6_7_5 + A_6_8_0
+                                 + A_6_8_1 + A_6_8_2 + A_6_8_3 + A_6_8_4
+                                 + A_6_8_5 + A_6_9_0 + A_6_9_1 + A_6_9_2
+                                 + A_6_9_3 + A_6_9_4 + A_6_9_5 - x_6_0 - x_6_1
+                                 - x_6_2 - x_6_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_6#1578: x_6_0
+                                 - 5 w_6_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_6#1579: x_6_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_6#1580: x_6_1
+                                 - 5 w_6_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_6#1581: x_6_1
+                                 - 5 w_6_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_6#1582: x_6_2
+                                 - 5 w_6_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_6#1583: x_6_2
+                                 - 5 w_6_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_6#1584: x_6_3 - 5 w_6_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_7#1585: A_7_0_0
+                                 + A_7_0_1 + A_7_0_2 + A_7_0_3 + A_7_0_4
+                                 + A_7_0_5 + A_7_1_0 + A_7_1_1 + A_7_1_2
+                                 + A_7_1_3 + A_7_1_4 + A_7_1_5 + A_7_2_0
+                                 + A_7_2_1 + A_7_2_2 + A_7_2_3 + A_7_2_4
+                                 + A_7_2_5 + A_7_3_0 + A_7_3_1 + A_7_3_2
+                                 + A_7_3_3 + A_7_3_4 + A_7_3_5 + A_7_4_0
+                                 + A_7_4_1 + A_7_4_2 + A_7_4_3 + A_7_4_4
+                                 + A_7_4_5 + A_7_5_0 + A_7_5_1 + A_7_5_2
+                                 + A_7_5_3 + A_7_5_4 + A_7_5_5 + A_7_6_0
+                                 + A_7_6_1 + A_7_6_2 + A_7_6_3 + A_7_6_4
+                                 + A_7_6_5 + A_7_7_0 + A_7_7_1 + A_7_7_2
+                                 + A_7_7_3 + A_7_7_4 + A_7_7_5 + A_7_8_0
+                                 + A_7_8_1 + A_7_8_2 + A_7_8_3 + A_7_8_4
+                                 + A_7_8_5 + A_7_9_0 + A_7_9_1 + A_7_9_2
+                                 + A_7_9_3 + A_7_9_4 + A_7_9_5 - x_7_0 - x_7_1
+                                 - x_7_2 - x_7_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_7#1586: x_7_0
+                                 - 5 w_7_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_7#1587: x_7_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_7#1588: x_7_1
+                                 - 5 w_7_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_7#1589: x_7_1
+                                 - 5 w_7_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_7#1590: x_7_2
+                                 - 5 w_7_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_7#1591: x_7_2
+                                 - 5 w_7_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_7#1592: x_7_3 - 5 w_7_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_8#1593: A_8_0_0
+                                 + A_8_0_1 + A_8_0_2 + A_8_0_3 + A_8_0_4
+                                 + A_8_0_5 + A_8_1_0 + A_8_1_1 + A_8_1_2
+                                 + A_8_1_3 + A_8_1_4 + A_8_1_5 + A_8_2_0
+                                 + A_8_2_1 + A_8_2_2 + A_8_2_3 + A_8_2_4
+                                 + A_8_2_5 + A_8_3_0 + A_8_3_1 + A_8_3_2
+                                 + A_8_3_3 + A_8_3_4 + A_8_3_5 + A_8_4_0
+                                 + A_8_4_1 + A_8_4_2 + A_8_4_3 + A_8_4_4
+                                 + A_8_4_5 + A_8_5_0 + A_8_5_1 + A_8_5_2
+                                 + A_8_5_3 + A_8_5_4 + A_8_5_5 + A_8_6_0
+                                 + A_8_6_1 + A_8_6_2 + A_8_6_3 + A_8_6_4
+                                 + A_8_6_5 + A_8_7_0 + A_8_7_1 + A_8_7_2
+                                 + A_8_7_3 + A_8_7_4 + A_8_7_5 + A_8_8_0
+                                 + A_8_8_1 + A_8_8_2 + A_8_8_3 + A_8_8_4
+                                 + A_8_8_5 + A_8_9_0 + A_8_9_1 + A_8_9_2
+                                 + A_8_9_3 + A_8_9_4 + A_8_9_5 - x_8_0 - x_8_1
+                                 - x_8_2 - x_8_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_8#1594: x_8_0
+                                 - 5 w_8_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_8#1595: x_8_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_8#1596: x_8_1
+                                 - 5 w_8_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_8#1597: x_8_1
+                                 - 5 w_8_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_8#1598: x_8_2
+                                 - 5 w_8_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_8#1599: x_8_2
+                                 - 5 w_8_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_8#1600: x_8_3 - 5 w_8_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_9#1601: A_9_0_0
+                                 + A_9_0_1 + A_9_0_2 + A_9_0_3 + A_9_0_4
+                                 + A_9_0_5 + A_9_1_0 + A_9_1_1 + A_9_1_2
+                                 + A_9_1_3 + A_9_1_4 + A_9_1_5 + A_9_2_0
+                                 + A_9_2_1 + A_9_2_2 + A_9_2_3 + A_9_2_4
+                                 + A_9_2_5 + A_9_3_0 + A_9_3_1 + A_9_3_2
+                                 + A_9_3_3 + A_9_3_4 + A_9_3_5 + A_9_4_0
+                                 + A_9_4_1 + A_9_4_2 + A_9_4_3 + A_9_4_4
+                                 + A_9_4_5 + A_9_5_0 + A_9_5_1 + A_9_5_2
+                                 + A_9_5_3 + A_9_5_4 + A_9_5_5 + A_9_6_0
+                                 + A_9_6_1 + A_9_6_2 + A_9_6_3 + A_9_6_4
+                                 + A_9_6_5 + A_9_7_0 + A_9_7_1 + A_9_7_2
+                                 + A_9_7_3 + A_9_7_4 + A_9_7_5 + A_9_8_0
+                                 + A_9_8_1 + A_9_8_2 + A_9_8_3 + A_9_8_4
+                                 + A_9_8_5 + A_9_9_0 + A_9_9_1 + A_9_9_2
+                                 + A_9_9_3 + A_9_9_4 + A_9_9_5 - x_9_0 - x_9_1
+                                 - x_9_2 - x_9_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_9#1602: x_9_0
+                                 - 5 w_9_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_9#1603: x_9_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_9#1604: x_9_1
+                                 - 5 w_9_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_9#1605: x_9_1
+                                 - 5 w_9_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_9#1606: x_9_2
+                                 - 5 w_9_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_9#1607: x_9_2
+                                 - 5 w_9_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_9#1608: x_9_3 - 5 w_9_2
+                                 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_10#1609: A_10_0_0
+                                 + A_10_0_1 + A_10_0_2 + A_10_0_3 + A_10_0_4
+                                 + A_10_0_5 + A_10_1_0 + A_10_1_1 + A_10_1_2
+                                 + A_10_1_3 + A_10_1_4 + A_10_1_5 + A_10_2_0
+                                 + A_10_2_1 + A_10_2_2 + A_10_2_3 + A_10_2_4
+                                 + A_10_2_5 + A_10_3_0 + A_10_3_1 + A_10_3_2
+                                 + A_10_3_3 + A_10_3_4 + A_10_3_5 + A_10_4_0
+                                 + A_10_4_1 + A_10_4_2 + A_10_4_3 + A_10_4_4
+                                 + A_10_4_5 + A_10_5_0 + A_10_5_1 + A_10_5_2
+                                 + A_10_5_3 + A_10_5_4 + A_10_5_5 + A_10_6_0
+                                 + A_10_6_1 + A_10_6_2 + A_10_6_3 + A_10_6_4
+                                 + A_10_6_5 + A_10_7_0 + A_10_7_1 + A_10_7_2
+                                 + A_10_7_3 + A_10_7_4 + A_10_7_5 + A_10_8_0
+                                 + A_10_8_1 + A_10_8_2 + A_10_8_3 + A_10_8_4
+                                 + A_10_8_5 + A_10_9_0 + A_10_9_1 + A_10_9_2
+                                 + A_10_9_3 + A_10_9_4 + A_10_9_5 - x_10_0
+                                 - x_10_1 - x_10_2 - x_10_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_10#1610: x_10_0
+                                 - 5 w_10_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_10#1611: x_10_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_10#1612: x_10_1
+                                 - 5 w_10_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_10#1613: x_10_1
+                                 - 5 w_10_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_10#1614: x_10_2
+                                 - 5 w_10_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_10#1615: x_10_2
+                                 - 5 w_10_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_10#1616: x_10_3
+                                 - 5 w_10_2 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_11#1617: A_11_0_0
+                                 + A_11_0_1 + A_11_0_2 + A_11_0_3 + A_11_0_4
+                                 + A_11_0_5 + A_11_1_0 + A_11_1_1 + A_11_1_2
+                                 + A_11_1_3 + A_11_1_4 + A_11_1_5 + A_11_2_0
+                                 + A_11_2_1 + A_11_2_2 + A_11_2_3 + A_11_2_4
+                                 + A_11_2_5 + A_11_3_0 + A_11_3_1 + A_11_3_2
+                                 + A_11_3_3 + A_11_3_4 + A_11_3_5 + A_11_4_0
+                                 + A_11_4_1 + A_11_4_2 + A_11_4_3 + A_11_4_4
+                                 + A_11_4_5 + A_11_5_0 + A_11_5_1 + A_11_5_2
+                                 + A_11_5_3 + A_11_5_4 + A_11_5_5 + A_11_6_0
+                                 + A_11_6_1 + A_11_6_2 + A_11_6_3 + A_11_6_4
+                                 + A_11_6_5 + A_11_7_0 + A_11_7_1 + A_11_7_2
+                                 + A_11_7_3 + A_11_7_4 + A_11_7_5 + A_11_8_0
+                                 + A_11_8_1 + A_11_8_2 + A_11_8_3 + A_11_8_4
+                                 + A_11_8_5 + A_11_9_0 + A_11_9_1 + A_11_9_2
+                                 + A_11_9_3 + A_11_9_4 + A_11_9_5 - x_11_0
+                                 - x_11_1 - x_11_2 - x_11_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_11#1618: x_11_0
+                                 - 5 w_11_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_11#1619: x_11_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_11#1620: x_11_1
+                                 - 5 w_11_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_11#1621: x_11_1
+                                 - 5 w_11_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_11#1622: x_11_2
+                                 - 5 w_11_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_11#1623: x_11_2
+                                 - 5 w_11_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_11#1624: x_11_3
+                                 - 5 w_11_2 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_12#1625: A_12_0_0
+                                 + A_12_0_1 + A_12_0_2 + A_12_0_3 + A_12_0_4
+                                 + A_12_0_5 + A_12_1_0 + A_12_1_1 + A_12_1_2
+                                 + A_12_1_3 + A_12_1_4 + A_12_1_5 + A_12_2_0
+                                 + A_12_2_1 + A_12_2_2 + A_12_2_3 + A_12_2_4
+                                 + A_12_2_5 + A_12_3_0 + A_12_3_1 + A_12_3_2
+                                 + A_12_3_3 + A_12_3_4 + A_12_3_5 + A_12_4_0
+                                 + A_12_4_1 + A_12_4_2 + A_12_4_3 + A_12_4_4
+                                 + A_12_4_5 + A_12_5_0 + A_12_5_1 + A_12_5_2
+                                 + A_12_5_3 + A_12_5_4 + A_12_5_5 + A_12_6_0
+                                 + A_12_6_1 + A_12_6_2 + A_12_6_3 + A_12_6_4
+                                 + A_12_6_5 + A_12_7_0 + A_12_7_1 + A_12_7_2
+                                 + A_12_7_3 + A_12_7_4 + A_12_7_5 + A_12_8_0
+                                 + A_12_8_1 + A_12_8_2 + A_12_8_3 + A_12_8_4
+                                 + A_12_8_5 + A_12_9_0 + A_12_9_1 + A_12_9_2
+                                 + A_12_9_3 + A_12_9_4 + A_12_9_5 - x_12_0
+                                 - x_12_1 - x_12_2 - x_12_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_12#1626: x_12_0
+                                 - 5 w_12_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_12#1627: x_12_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_12#1628: x_12_1
+                                 - 5 w_12_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_12#1629: x_12_1
+                                 - 5 w_12_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_12#1630: x_12_2
+                                 - 5 w_12_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_12#1631: x_12_2
+                                 - 5 w_12_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_12#1632: x_12_3
+                                 - 5 w_12_2 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_13#1633: A_13_0_0
+                                 + A_13_0_1 + A_13_0_2 + A_13_0_3 + A_13_0_4
+                                 + A_13_0_5 + A_13_1_0 + A_13_1_1 + A_13_1_2
+                                 + A_13_1_3 + A_13_1_4 + A_13_1_5 + A_13_2_0
+                                 + A_13_2_1 + A_13_2_2 + A_13_2_3 + A_13_2_4
+                                 + A_13_2_5 + A_13_3_0 + A_13_3_1 + A_13_3_2
+                                 + A_13_3_3 + A_13_3_4 + A_13_3_5 + A_13_4_0
+                                 + A_13_4_1 + A_13_4_2 + A_13_4_3 + A_13_4_4
+                                 + A_13_4_5 + A_13_5_0 + A_13_5_1 + A_13_5_2
+                                 + A_13_5_3 + A_13_5_4 + A_13_5_5 + A_13_6_0
+                                 + A_13_6_1 + A_13_6_2 + A_13_6_3 + A_13_6_4
+                                 + A_13_6_5 + A_13_7_0 + A_13_7_1 + A_13_7_2
+                                 + A_13_7_3 + A_13_7_4 + A_13_7_5 + A_13_8_0
+                                 + A_13_8_1 + A_13_8_2 + A_13_8_3 + A_13_8_4
+                                 + A_13_8_5 + A_13_9_0 + A_13_9_1 + A_13_9_2
+                                 + A_13_9_3 + A_13_9_4 + A_13_9_5 - x_13_0
+                                 - x_13_1 - x_13_2 - x_13_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_13#1634: x_13_0
+                                 - 5 w_13_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_13#1635: x_13_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_13#1636: x_13_1
+                                 - 5 w_13_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_13#1637: x_13_1
+                                 - 5 w_13_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_13#1638: x_13_2
+                                 - 5 w_13_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_13#1639: x_13_2
+                                 - 5 w_13_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_13#1640: x_13_3
+                                 - 5 w_13_2 <= 0
+ Restriccion_de_la_cantidad_de_turnos_para_el_trabajador_14#1641: A_14_0_0
+                                 + A_14_0_1 + A_14_0_2 + A_14_0_3 + A_14_0_4
+                                 + A_14_0_5 + A_14_1_0 + A_14_1_1 + A_14_1_2
+                                 + A_14_1_3 + A_14_1_4 + A_14_1_5 + A_14_2_0
+                                 + A_14_2_1 + A_14_2_2 + A_14_2_3 + A_14_2_4
+                                 + A_14_2_5 + A_14_3_0 + A_14_3_1 + A_14_3_2
+                                 + A_14_3_3 + A_14_3_4 + A_14_3_5 + A_14_4_0
+                                 + A_14_4_1 + A_14_4_2 + A_14_4_3 + A_14_4_4
+                                 + A_14_4_5 + A_14_5_0 + A_14_5_1 + A_14_5_2
+                                 + A_14_5_3 + A_14_5_4 + A_14_5_5 + A_14_6_0
+                                 + A_14_6_1 + A_14_6_2 + A_14_6_3 + A_14_6_4
+                                 + A_14_6_5 + A_14_7_0 + A_14_7_1 + A_14_7_2
+                                 + A_14_7_3 + A_14_7_4 + A_14_7_5 + A_14_8_0
+                                 + A_14_8_1 + A_14_8_2 + A_14_8_3 + A_14_8_4
+                                 + A_14_8_5 + A_14_9_0 + A_14_9_1 + A_14_9_2
+                                 + A_14_9_3 + A_14_9_4 + A_14_9_5 - x_14_0
+                                 - x_14_1 - x_14_2 - x_14_3  = 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(i)_14#1642: x_14_0
+                                 - 5 w_14_0 >= 0
+ Restriccion_primer_tramo_funcion_de_costo_trabajador_(ii)_14#1643: x_14_0 <= 5
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(i)_14#1644: x_14_1
+                                 - 5 w_14_1 >= 0
+ Restriccion_segundo_tramo_funcion_de_costo_trabajador_(ii)_14#1645: x_14_1
+                                 - 5 w_14_0 <= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(i)_14#1646: x_14_2
+                                 - 5 w_14_2 >= 0
+ Restriccion_tercer_tramo_funcion_de_costo_trabajador_(ii)_14#1647: x_14_2
+                                 - 5 w_14_1 <= 0
+ Restriccion_cuarto_tramo_funcion_de_costo_trabajador_14#1648: x_14_3
+                                 - 5 w_14_2 <= 0
 Bounds
  0 <= A_0_0_0 <= 1
  0 <= A_0_0_1 <= 1
