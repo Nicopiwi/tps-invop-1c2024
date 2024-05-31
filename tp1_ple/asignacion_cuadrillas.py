@@ -189,9 +189,6 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Orden {j} a lo sumo un turno (i)")
 
-
-    print(filas, senses, rhs, names)
-
     for j in range(instancia.cantidad_ordenes):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[:, j, :], newshape=-1).tolist()
         indices.append(instancia._indices_delta_j[j])
@@ -202,7 +199,36 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Orden {j} a lo sumo un turno (ii)")
 
+    # AGREGAR AL MODELO
+    for i, j in itertools.product(range(instancia.cantidad_trabajadores), range(instancia.cantidad_ordenes)):
+        indices = np.reshape(np.array(instancia._indices_A_ijd)[i, j, :], newshape=-1).tolist()
+        indices.append(instancia._indices_TR_id[i][0])
+        valores = [1] * 6 + [-1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append(f"Trabajador {i} trabaja en la orden {j} a lo sumo un dia")
 
+    #AGREGAR AL MODELO
+    for i, (j1, j2), d, k in itertools.product(
+        range(instancia.cantidad_trabajadores),
+        itertools.combinations(range(instancia.cantidad_ordenes), 2),
+        range(6),
+        range(5)
+    ):
+        indices = [
+            instancia._indices_A_ijd[i][j1][d],
+            instancia._indices_B_jdk[j1][d][k],
+            instancia._indices_A_ijd[i][j2][d],
+            instancia._indices_B_jdk[j2][d][k]
+        ]
+        valores = [1, 1, 1, 1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(3)
+        names.append(f"Trabajador {i} no puede trabajar en las ordenes {j1} y {j2} en el turno {k} del dia {d}")
 
     for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[i, :, d], newshape=-1).tolist()
@@ -252,6 +278,19 @@ def agregar_restricciones(prob, instancia):
         senses.append('L')
         rhs.append(3)
         names.append(f"Ordenes {j1} y {j2} no pueden ser asignadas al mismo trabajador consecutivamente")
+
+        indices = [
+            instancia._indices_A_ijd[i][j2][d], 
+            instancia._indices_B_jdk[j2][d][k],
+            instancia._indices_A_ijd[i][j1][d],
+            instancia._indices_B_jdk[j1][d][k+1]
+        ]
+        valores = [1, 1, 1, 1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(3)
+        names.append(f"Ordenes {j2} y {j1} no pueden ser asignadas al mismo trabajador consecutivamente")
 
     for (j1, j2), d, k in itertools.product(
         instancia.ordenes_correlativas, 
@@ -409,13 +448,16 @@ def mostrar_solucion(prob,instancia):
         if x[instancia._indices_B_jdk[j][d][k]] > TOLERANCE:
             print(f"La orden {j} se asigna al turno {k} del dia {d}")
 
-    # La orden j es realizada por los trabajadores i1, ..., imax
+    # La orden j es realizada por los trabajadores i1, ..., imax / La orden j no se realiza
     for j in range(instancia.cantidad_ordenes):
         trabajadores = []
         for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
             if x[instancia._indices_A_ijd[i][j][d]] > TOLERANCE:
                 trabajadores.append(i)
-        print(f"La orden {j} es realizada por los trabajadores {trabajadores}")
+        if x[instancia._indices_delta_j[j]] > TOLERANCE:
+            print(f"La orden {j} es realizada por los trabajadores {trabajadores}")
+        else:
+            print(f"La orden {j} no se realiza. Por lo tanto, los trabajadores son {trabajadores}")
 
 def main():
     
