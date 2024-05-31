@@ -417,6 +417,9 @@ def main():
     
     # Definicion del problema de Cplex
     prob = cplex.Cplex()
+
+    # Setear el sentido del problema
+    prob.objective.set_sense(prob.objective.sense.maximize)
     
     # Definicion del modelo
     armar_lp(prob,instancia)
