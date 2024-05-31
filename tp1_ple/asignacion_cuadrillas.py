@@ -17,12 +17,12 @@ class InstanciaAsignacionCuadrillas:
         self.ordenes_correlativas = []
         self.ordenes_conflictivas = []
         self.ordenes_repetitivas = []
-        self._indices_A_ijd = [] # 6 * T * O variables
-        self._indices_B_jdk = [] # 30 * O variables
-        self._indices_TR_id = [] # 6 * T variables
-        self._indices_delta_j = [] # O variables
-        self._indices_x_ir = [] # 4 * T variables
-        self._indices_w_ir = [] # 3 * T variables
+        self._indices_A_ijd = [] # 6 * T * O variables. Representa si el trabajador i trabaja en la orden j en el dia d
+        self._indices_B_jdk = [] # 30 * O variables. Representa si la orden j en el turno k del dia d
+        self._indices_TR_id = [] # 6 * T variables. Representa si el trabajador i trabaja en el dia d
+        self._indices_delta_j = [] # O variables. Representa si la orden j se asigna a algún turno
+        self._indices_x_ir = [] # 4 * T variables. Representa la cantidad de turnos que trabaja el trabajador i en el tramo r
+        self._indices_w_ir = [] # 3 * T variables. Representa si el tramo r del trabajador i es activado
         self._total_variables = 0
         
     def leer_datos(self,nombre_archivo):
@@ -122,16 +122,15 @@ def cargar_instancia():
     return instancia
 
 def agregar_variables(prob, instancia):
-    # Llenar coef\_funcion\_objetivo
     coeficientes_funcion_objetivo = [0]*instancia._total_variables
 
     print(instancia._total_variables)
-    # Llenar coeficientes_funcion_objetivo con los beneficios de las ordenes
+    # Beneficios de las ordenes
     for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
         #print(j, d, k, instancia._indices_B_jdk[j][d][k])
         coeficientes_funcion_objetivo[instancia._indices_B_jdk[j][d][k]] = int(instancia.ordenes[j].beneficio)
 
-    # Llenar coeficientes_funcion_objetivo con los costos de las ordenes
+    # Costos de las ordenes
     for i in range(instancia.cantidad_trabajadores):
         coeficientes_funcion_objetivo[instancia._indices_x_ir[i][0]] = -1000
         coeficientes_funcion_objetivo[instancia._indices_x_ir[i][1]] = -1200
@@ -175,19 +174,6 @@ def agregar_variables(prob, instancia):
     prob.variables.add(obj = coeficientes_funcion_objetivo, lb = lb, ub = ub, types=types, names=nombres)
 
 def agregar_restricciones(prob, instancia):
-    # Agregar las restricciones ax <= (>= ==) b:
-	# funcion 'add' de 'linear_constraints' con parametros:
-	# lin_expr: lista de listas de [ind,val] de a
-    # sense: lista de 'L', 'G' o 'E'
-    # rhs: lista de los b
-    # names: nombre (como van a aparecer en el archivo .lp)
-	
-    # Notar que cplex espera "una matriz de restricciones", es decir, una
-    # lista de restricciones del tipo ax <= b, [ax <= b]. Por lo tanto, aun cuando
-    # agreguemos una unica restriccion, tenemos que hacerlo como una lista de un unico
-    # elemento.
-
-    # Restriccion generica
     filas = []
     senses = []
     rhs = []
@@ -384,7 +370,7 @@ def armar_lp(prob, instancia):
     # prob.objective.set_sense(prob.objective.sense.....)
 
     # Escribir el lp a archivo
-    prob.write('asignacionCuadrillas.lp')
+    prob.write('asignacionCuadrillas2.lp')
 
 def resolver_lp(prob):
     
@@ -394,8 +380,9 @@ def resolver_lp(prob):
     # Resolver el lp
     prob.solve()
 
-#def mostrar_solucion(prob,instancia):
+def mostrar_solucion(prob,instancia):
     # Obtener informacion de la solucion a traves de 'solution'
+    TOLERANCE = 10e-6
     
     # Tomar el estado de la resolucion
     status = prob.solution.get_status_string(status_code = prob.solution.get_status())
@@ -407,8 +394,28 @@ def resolver_lp(prob):
     
     # Tomar los valores de las variables
     x  = prob.solution.get_values()
+
+
     # Mostrar las variables con valor positivo (mayor que una tolerancia)
-    print(x)
+
+    # Mostramos las asignaciones de la siguiente forma:
+    # Trabajador i trabaja en la orden j en el dia d
+    for i, j, d in itertools.product(range(instancia.cantidad_trabajadores), range(instancia.cantidad_ordenes), range(6)):
+        if x[instancia._indices_A_ijd[i][j][d]] > TOLERANCE:
+            print(f"Trabajador {i} trabaja en la orden {j} en el dia {d}")
+
+    # La orden j se asigna al turno k del dia d
+    for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
+        if x[instancia._indices_B_jdk[j][d][k]] > TOLERANCE:
+            print(f"La orden {j} se asigna al turno {k} del dia {d}")
+
+    # La orden j es realizada por los trabajadores i1, ..., imax
+    for j in range(instancia.cantidad_ordenes):
+        trabajadores = []
+        for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
+            if x[instancia._indices_A_ijd[i][j][d]] > TOLERANCE:
+                trabajadores.append(i)
+        print(f"La orden {j} es realizada por los trabajadores {trabajadores}")
 
 def main():
     
@@ -428,7 +435,7 @@ def main():
     resolver_lp(prob)
 
     # Obtencion de la solucion
-    # mostrar_solucion(prob,instancia)
+    mostrar_solucion(prob,instancia)
 
 if __name__ == '__main__':
     main()
