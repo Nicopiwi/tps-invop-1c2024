@@ -210,7 +210,7 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Trabajador {i} trabaja en la orden {j} a lo sumo un dia")
 
-    #AGREGAR AL MODELO
+    #AGREGAR AL MODELO. Ver si se puede simplificar
     for i, (j1, j2), d, k in itertools.product(
         range(instancia.cantidad_trabajadores),
         itertools.combinations(range(instancia.cantidad_ordenes), 2),
