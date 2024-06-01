@@ -197,18 +197,45 @@ def agregar_restricciones(prob, instancia):
         filas.append(fila)
         senses.append('E')
         rhs.append(0)
-        names.append(f"Orden {j} a lo sumo un turno (ii)")
+        names.append(f"Orden {j} respeta cantidad de trabajadores, si se realiza")
 
     # AGREGAR AL MODELO
     for i, j in itertools.product(range(instancia.cantidad_trabajadores), range(instancia.cantidad_ordenes)):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[i, j, :], newshape=-1).tolist()
-        indices.append(instancia._indices_TR_id[i][0])
-        valores = [1] * 6 + [-1]
+        valores = [1] * 6
         fila = [indices,valores]
         filas.append(fila)
         senses.append('L')
-        rhs.append(0)
+        rhs.append(1)
         names.append(f"Trabajador {i} trabaja en la orden {j} a lo sumo un dia")
+
+    # AGREGAR AL MODELO
+    for (i1, i2), j, (d1, d2) in itertools.product(
+        itertools.combinations(range(instancia.cantidad_trabajadores), 2),
+        range(instancia.cantidad_ordenes),
+        itertools.combinations(range(6), 2)
+    ):
+        indices = [
+            instancia._indices_A_ijd[i1][j][d1],
+            instancia._indices_A_ijd[i2][j][d2]
+        ]
+        valores = [1, 1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(1)
+        names.append(f"Trabajadores {i1} y {i2} no pueden trabajar en la orden {j} en días distintos")
+
+        indices = [
+            instancia._indices_A_ijd[i1][j][d2],
+            instancia._indices_A_ijd[i2][j][d1]
+        ]
+        valores = [1, 1]
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(1)
+        names.append(f"Trabajadores {i1} y {i2} no pueden trabajar en la orden {j} en días distintos")
 
     #AGREGAR AL MODELO. Ver si se puede simplificar
     for i, (j1, j2), d, k in itertools.product(
@@ -229,6 +256,23 @@ def agregar_restricciones(prob, instancia):
         senses.append('L')
         rhs.append(3)
         names.append(f"Trabajador {i} no puede trabajar en las ordenes {j1} y {j2} en el turno {k} del dia {d}")
+
+    #AGREGAR AL MODELO
+    for i, j, d in itertools.product(
+        range(instancia.cantidad_trabajadores),
+        range(instancia.cantidad_ordenes),
+        range(6),
+    ):
+        indices = [
+            instancia._indices_A_ijd[i][j][d],
+            *instancia._indices_B_jdk[j][d],
+        ]
+        valores = [1] + [-1] * 5
+        fila = [indices,valores]
+        filas.append(fila)
+        senses.append('L')
+        rhs.append(0)
+        names.append(f"Si el trabajador {i} trabaja en la orden {j} en el dia {d}, entonces la orden es asignada al día {d}")
 
     for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[i, :, d], newshape=-1).tolist()
