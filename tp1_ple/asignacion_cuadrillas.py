@@ -210,32 +210,32 @@ def agregar_restricciones(prob, instancia):
         names.append(f"Trabajador {i} trabaja en la orden {j} a lo sumo un dia")
 
     # AGREGAR AL MODELO
-    for (i1, i2), j, (d1, d2) in itertools.product(
-        itertools.combinations(range(instancia.cantidad_trabajadores), 2),
-        range(instancia.cantidad_ordenes),
-        itertools.combinations(range(6), 2)
-    ):
-        indices = [
-            instancia._indices_A_ijd[i1][j][d1],
-            instancia._indices_A_ijd[i2][j][d2]
-        ]
-        valores = [1, 1]
-        fila = [indices,valores]
-        filas.append(fila)
-        senses.append('L')
-        rhs.append(1)
-        names.append(f"Trabajadores {i1} y {i2} no pueden trabajar en la orden {j} en días distintos")
+    # for (i1, i2), j, (d1, d2) in itertools.product(
+    #     itertools.combinations(range(instancia.cantidad_trabajadores), 2),
+    #     range(instancia.cantidad_ordenes),
+    #     itertools.combinations(range(6), 2)
+    # ):
+    #     indices = [
+    #         instancia._indices_A_ijd[i1][j][d1],
+    #         instancia._indices_A_ijd[i2][j][d2]
+    #     ]
+    #     valores = [1, 1]
+    #     fila = [indices,valores]
+    #     filas.append(fila)
+    #     senses.append('L')
+    #     rhs.append(1)
+    #     names.append(f"Trabajadores {i1} y {i2} no pueden trabajar en la orden {j} en días distintos")
 
-        indices = [
-            instancia._indices_A_ijd[i1][j][d2],
-            instancia._indices_A_ijd[i2][j][d1]
-        ]
-        valores = [1, 1]
-        fila = [indices,valores]
-        filas.append(fila)
-        senses.append('L')
-        rhs.append(1)
-        names.append(f"Trabajadores {i1} y {i2} no pueden trabajar en la orden {j} en días distintos")
+    #     indices = [
+    #         instancia._indices_A_ijd[i1][j][d2],
+    #         instancia._indices_A_ijd[i2][j][d1]
+    #     ]
+    #     valores = [1, 1]
+    #     fila = [indices,valores]
+    #     filas.append(fila)
+    #     senses.append('L')
+    #     rhs.append(1)
+    #     names.append(f"Trabajadores {i1} y {i2} no pueden trabajar en la orden {j} en días distintos")
 
     #AGREGAR AL MODELO. Ver si se puede simplificar
     for i, (j1, j2), d, k in itertools.product(
