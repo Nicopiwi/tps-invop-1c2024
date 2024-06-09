@@ -123,8 +123,6 @@ def cargar_instancia():
 
 def agregar_variables(prob, instancia):
     coeficientes_funcion_objetivo = [0]*instancia._total_variables
-
-    print(instancia._total_variables)
     # Beneficios de las ordenes
     for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
         #print(j, d, k, instancia._indices_B_jdk[j][d][k])
