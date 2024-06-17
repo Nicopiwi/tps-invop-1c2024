@@ -525,8 +525,6 @@ def resolver_lp(prob, instancia):
 
 # Obtener informacion de la solucion a traves de 'solution'
 def mostrar_solucion(prob, instancia):
-    print('Se ha resuelto el problema en', instancia.tiempo_de_computo, 'segundos')
-
     # Tomar el estado de la resolucion
     status = prob.solution.get_status_string(status_code = prob.solution.get_status())
     
