@@ -5,11 +5,27 @@ from recordclass import recordclass
 import numpy as np
 import itertools
 
-TOLERANCE =10e-6 
 Orden = recordclass('Orden', 'id beneficio cant_trab')
 
 class InstanciaAsignacionCuadrillas:
-    def __init__(self):
+    def __init__(
+        self, 
+        activar_restriccion_opcional_1 = False, 
+        activar_restriccion_opcional_2 = False,
+        tolerancia = 1e-6,
+        seleccion_nodo = None, 
+        seleccion_variable = None,
+        heuristica_primal = None,
+        preproceso = None
+    ):
+        self.activar_restriccion_opcional_1 = activar_restriccion_opcional_1
+        self.activar_restriccion_opcional_2 = activar_restriccion_opcional_2
+        self.seleccion_nodo = seleccion_nodo
+        self.seleccion_variable = seleccion_variable
+        self.tolerancia = tolerancia
+        self.heuristica_primal = heuristica_primal
+        self.preproceso = preproceso
+
         self.cantidad_trabajadores = 0
         self.cantidad_ordenes = 0
         self.ordenes = []
@@ -24,6 +40,8 @@ class InstanciaAsignacionCuadrillas:
         self._indices_x_ir = [] # 4 * T variables. Representa la cantidad de turnos que trabaja el trabajador i en el tramo r
         self._indices_w_ir = [] # 3 * T variables. Representa si el tramo r del trabajador i es activado
         self._total_variables = 0
+
+        self.tiempo_de_computo = 0
         
     def leer_datos(self,nombre_archivo):
 
@@ -111,7 +129,6 @@ class InstanciaAsignacionCuadrillas:
         # Se cierra el archivo de entrada
         f.close()
 
-
 def cargar_instancia():
     # El 1er parametro es el nombre del archivo de entrada 	
     nombre_archivo = sys.argv[1].strip()
@@ -121,11 +138,34 @@ def cargar_instancia():
     instancia.leer_datos(nombre_archivo)
     return instancia
 
+def cargar_instancia_con_configuracion(
+    path, 
+    activar_restriccion_opcional_1 = False, 
+    activar_restriccion_opcional_2 = False,
+    tolerancia = 1e-6,
+    seleccion_nodo = None,
+    seleccion_variable = None,
+    heuristica_primal = None,
+    preproceso = None
+):
+    instancia = InstanciaAsignacionCuadrillas(
+        activar_restriccion_opcional_1 = activar_restriccion_opcional_1,
+        activar_restriccion_opcional_2 = activar_restriccion_opcional_2,
+        tolerancia = tolerancia,
+        seleccion_nodo = seleccion_nodo,
+        seleccion_variable = seleccion_variable,
+        heuristica_primal = heuristica_primal,
+        preproceso = preproceso
+    )
+    instancia.leer_datos(path)
+    return instancia
+
 def agregar_variables(prob, instancia):
     coeficientes_funcion_objetivo = [0]*instancia._total_variables
+
+    print(instancia._total_variables)
     # Beneficios de las ordenes
     for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
-        #print(j, d, k, instancia._indices_B_jdk[j][d][k])
         coeficientes_funcion_objetivo[instancia._indices_B_jdk[j][d][k]] = int(instancia.ordenes[j].beneficio)
 
     # Costos de las ordenes
@@ -226,7 +266,7 @@ def agregar_restricciones(prob, instancia):
         senses.append('L')
         rhs.append(3)
         names.append(f"Trabajador {i} no puede trabajar en las ordenes {j1} y {j2} en el turno {k} del dia {d}")
-
+    
     #AGREGAR AL MODELO
     for i, j, d in itertools.product(
         range(instancia.cantidad_trabajadores),
@@ -407,11 +447,46 @@ def agregar_restricciones(prob, instancia):
         senses.append('L')
         rhs.append(0)
         names.append(f"Restriccion cuarto tramo funcion de costo trabajador {i}")
-    
+
+    # Restricción adicional 1 
+    if instancia.activar_restriccion_opcional_1:
+        for (i1,i2), j, d in itertools.product(
+            instancia.conflictos_trabajadores,
+            range(instancia.cantidad_ordenes),
+            range(6)
+        ):
+            indices = [
+                instancia._indices_A_ijd[i1][j][d],
+                instancia._indices_A_ijd[i2][j][d],
+            ]
+            valores = [1, 1]
+            fila = [indices,valores]
+            filas.append(fila)
+            senses.append('L')
+            rhs.append(1)
+            names.append(f"Trabajador {i1} y trabajador {i2} no trabajan en una misma orden si estan conflictuados")
+
+    # Restricción adicional 2
+    if instancia.activar_restriccion_opcional_2:
+        for i, (j1,j2) in itertools.product(
+            range(instancia.cantidad_trabajadores),
+            instancia.ordenes_repetitivas
+        ):
+            indices = [
+                *instancia._indices_A_ijd[i][j1],
+                *instancia._indices_A_ijd[i][j2],
+            ]
+            valores = [1] * 6 + [1] * 6
+            fila = [indices,valores]
+            filas.append(fila)
+            senses.append('L')
+            rhs.append(1)
+            names.append(f"Trabajador {i} no trabaja en las ordenes {j1} y {j2} si son repetitivas")
+
     prob.linear_constraints.add(lin_expr=filas, senses=senses, rhs=rhs, names=names)
 
 
-def armar_lp(prob, instancia):
+def armar_lp(prob, instancia, shouldWrite = True):
 
     # Agregar las variables
     agregar_variables(prob, instancia)
@@ -419,24 +494,41 @@ def armar_lp(prob, instancia):
     # Agregar las restricciones 
     agregar_restricciones(prob, instancia)
 
-    # Setear el sentido del problema
-    # prob.objective.set_sense(prob.objective.sense.....)
+    prob.objective.set_sense(prob.objective.sense.maximize)
 
     # Escribir el lp a archivo
-    prob.write('asignacionCuadrillas3.lp')
+    if shouldWrite:
+        prob.write('asignacionCuadrillas3.lp')
 
-def resolver_lp(prob):
-    
+def resolver_lp(prob, instancia):
     # Definir los parametros del solver
-    # prob.parameters....
-       
+    prob.parameters.mip.tolerances.mipgap.set(instancia.tolerancia)
+
+    if instancia.seleccion_nodo is not None:
+        prob.parameters.mip.strategy.search.set(instancia.seleccion_nodo)
+    
+    if instancia.seleccion_variable is not None:
+        prob.parameters.mip.strategy.variableselect.set(instancia.seleccion_variable)
+    
+    if instancia.heuristica_primal is not None:
+        prob.parameters.mip.strategy.heuristiceffort.set(instancia.heuristica_primal)
+    
+    if instancia.preproceso is not None:
+        prob.parameters.preprocessing.presolve.set(instancia.preproceso)
+    
+    start_time = prob.get_time()
+
     # Resolver el lp
     prob.solve()
 
-def mostrar_solucion(prob,instancia):
-    # Obtener informacion de la solucion a traves de 'solution'
-    TOLERANCE = 10e-6
+    end_time = prob.get_time()
+    instancia.tiempo_de_computo = end_time - start_time
     
+
+# Obtener informacion de la solucion a traves de 'solution'
+def mostrar_solucion(prob, instancia):
+    print('Se ha resuelto el problema en', instancia.tiempo_de_computo, 'segundos')
+
     # Tomar el estado de la resolucion
     status = prob.solution.get_status_string(status_code = prob.solution.get_status())
     
@@ -448,27 +540,26 @@ def mostrar_solucion(prob,instancia):
     # Tomar los valores de las variables
     x  = prob.solution.get_values()
 
-
     # Mostrar las variables con valor positivo (mayor que una tolerancia)
 
     # Mostramos las asignaciones de la siguiente forma:
     # Trabajador i trabaja en la orden j en el dia d
     for i, j, d in itertools.product(range(instancia.cantidad_trabajadores), range(instancia.cantidad_ordenes), range(6)):
-        if x[instancia._indices_A_ijd[i][j][d]] > TOLERANCE:
+        if x[instancia._indices_A_ijd[i][j][d]] > instancia.tolerancia:
             print(f"Trabajador {i} trabaja en la orden {j} en el dia {d}")
 
     # La orden j se asigna al turno k del dia d
     for j, d, k in itertools.product(range(instancia.cantidad_ordenes), range(6), range(5)):
-        if x[instancia._indices_B_jdk[j][d][k]] > TOLERANCE:
+        if x[instancia._indices_B_jdk[j][d][k]] > instancia.tolerancia:
             print(f"La orden {j} se asigna al turno {k} del dia {d}")
 
     # La orden j es realizada por los trabajadores i1, ..., imax / La orden j no se realiza
     for j in range(instancia.cantidad_ordenes):
         trabajadores = []
         for i, d in itertools.product(range(instancia.cantidad_trabajadores), range(6)):
-            if x[instancia._indices_A_ijd[i][j][d]] > TOLERANCE:
+            if x[instancia._indices_A_ijd[i][j][d]] > instancia.tolerancia:
                 trabajadores.append(i)
-        if x[instancia._indices_delta_j[j]] > TOLERANCE:
+        if x[instancia._indices_delta_j[j]] > instancia.tolerancia:
             print(f"La orden {j} es realizada por los trabajadores {trabajadores}")
         else:
             print(f"La orden {j} no se realiza. Por lo tanto, los trabajadores son {trabajadores}")
