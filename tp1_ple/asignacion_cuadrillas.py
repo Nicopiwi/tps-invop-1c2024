@@ -16,10 +16,12 @@ class InstanciaAsignacionCuadrillas:
         seleccion_nodo = None, 
         seleccion_variable = None,
         heuristica_primal = None,
-        preproceso = None
+        preproceso = None,
+        penalizacion_conflicto = 0
     ):
         self.activar_restriccion_opcional_1 = activar_restriccion_opcional_1
         self.activar_restriccion_opcional_2 = activar_restriccion_opcional_2
+        self.penalizacion_conflicto = penalizacion_conflicto
         self.seleccion_nodo = seleccion_nodo
         self.seleccion_variable = seleccion_variable
         self.tolerancia = tolerancia
@@ -39,6 +41,7 @@ class InstanciaAsignacionCuadrillas:
         self._indices_delta_j = [] # O variables. Representa si la orden j se asigna a algún turno
         self._indices_x_ir = [] # 4 * T variables. Representa la cantidad de turnos que trabaja el trabajador i en el tramo r
         self._indices_w_ir = [] # 3 * T variables. Representa si el tramo r del trabajador i es activado
+        self._indices_Tc_pj = []
         self._total_variables = 0
 
         self.tiempo_de_computo = 0
@@ -53,36 +56,6 @@ class InstanciaAsignacionCuadrillas:
         
         # Lectura cantidad de ordenes
         self.cantidad_ordenes = int(f.readline())
-
-        # Precalculo de indices
-
-        indice_comienzo = 0
-        self._indices_A_ijd = np.arange(
-             6 * self.cantidad_trabajadores * self.cantidad_ordenes
-        ).reshape(self.cantidad_trabajadores, self.cantidad_ordenes, 6).tolist()
-        indice_comienzo += 6 * self.cantidad_trabajadores * self.cantidad_ordenes
-        self._indices_B_jdk = (
-            np.arange(self.cantidad_ordenes * 6 * 5)
-                .reshape(self.cantidad_ordenes, 6, 5) + indice_comienzo
-            ).tolist()
-        indice_comienzo += self.cantidad_ordenes * 6 * 5
-        self._indices_TR_id = (
-            np.arange(self.cantidad_trabajadores * 6)
-            .reshape(self.cantidad_trabajadores, 6) + indice_comienzo
-        ).tolist()
-        indice_comienzo += self.cantidad_trabajadores * 6
-        self._indices_delta_j = (np.arange(self.cantidad_ordenes) + indice_comienzo).tolist()
-        indice_comienzo += self.cantidad_ordenes
-        self._indices_x_ir = (
-            np.arange(self.cantidad_trabajadores * 4)
-            .reshape(self.cantidad_trabajadores, 4) + indice_comienzo
-        ).tolist()
-        indice_comienzo += self.cantidad_trabajadores * 4
-        self._indices_w_ir = (
-            np.arange(self.cantidad_trabajadores * 3)
-            .reshape(self.cantidad_trabajadores, 3) + indice_comienzo
-        ).tolist()
-        self._total_variables = indice_comienzo + self.cantidad_trabajadores * 3
 
         # Lectura de las ordenes
         self.ordenes = []
@@ -125,9 +98,54 @@ class InstanciaAsignacionCuadrillas:
         for i in range(cantidad_ordenes_repetitivas):
             linea = f.readline().split(' ')
             self.ordenes_repetitivas.append(list(map(int,linea)))
-        
         # Se cierra el archivo de entrada
         f.close()
+
+        # Precálculo de índices
+        indice_comienzo = 0
+        self._indices_A_ijd = np.arange(
+             6 * self.cantidad_trabajadores * self.cantidad_ordenes
+        ).reshape(self.cantidad_trabajadores, self.cantidad_ordenes, 6).tolist()
+        indice_comienzo += 6 * self.cantidad_trabajadores * self.cantidad_ordenes
+        self._indices_B_jdk = (
+            np.arange(self.cantidad_ordenes * 6 * 5)
+                .reshape(self.cantidad_ordenes, 6, 5) + indice_comienzo
+            ).tolist()
+        indice_comienzo += self.cantidad_ordenes * 6 * 5
+        self._indices_TR_id = (
+            np.arange(self.cantidad_trabajadores * 6)
+            .reshape(self.cantidad_trabajadores, 6) + indice_comienzo
+        ).tolist()
+        indice_comienzo += self.cantidad_trabajadores * 6
+        self._indices_delta_j = (np.arange(self.cantidad_ordenes) + indice_comienzo).tolist()
+        indice_comienzo += self.cantidad_ordenes
+        self._indices_x_ir = (
+            np.arange(self.cantidad_trabajadores * 4)
+            .reshape(self.cantidad_trabajadores, 4) + indice_comienzo
+        ).tolist()
+        indice_comienzo += self.cantidad_trabajadores * 4
+        self._indices_w_ir = (
+            np.arange(self.cantidad_trabajadores * 3)
+            .reshape(self.cantidad_trabajadores, 3) + indice_comienzo
+        ).tolist()
+        indice_comienzo += len(self.conflictos_trabajadores)
+#variables para analisis
+        
+
+        indice_comienzo = indice_comienzo + self.cantidad_trabajadores * 3
+
+        self._indices_Tc_pj = (
+            np.arange(len(self.conflictos_trabajadores)*self.cantidad_ordenes)
+            .reshape(len(self.conflictos_trabajadores), self.cantidad_ordenes) + indice_comienzo
+        ).tolist()
+
+        self._total_variables = indice_comienzo + len(self.conflictos_trabajadores) * self.cantidad_ordenes
+
+        print(
+            self.cantidad_ordenes, self.conflictos_trabajadores
+        )
+        print(self._total_variables)
+        print(self._indices_Tc_pj)
 
 def cargar_instancia():
     # El 1er parametro es el nombre del archivo de entrada 	
@@ -173,6 +191,11 @@ def agregar_variables(prob, instancia):
         coeficientes_funcion_objetivo[instancia._indices_x_ir[i][2]] = -1400
         coeficientes_funcion_objetivo[instancia._indices_x_ir[i][3]] = -1500
 
+    print(list(itertools.product(range(len(instancia.conflictos_trabajadores)), range(instancia.cantidad_ordenes))))
+    
+    for p, j in itertools.product(range(len(instancia.conflictos_trabajadores)), range(instancia.cantidad_ordenes)):
+        coeficientes_funcion_objetivo[instancia._indices_Tc_pj[p][j]] = instancia.penalizacion_conflicto
+
     # Ponemos nombre a las variables
     nombres = [""] * instancia._total_variables
 
@@ -193,6 +216,11 @@ def agregar_variables(prob, instancia):
     
     for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(3)):
         nombres[instancia._indices_w_ir[i][r]] = "w_{}_{}".format(i, r)
+
+    for p,j in itertools.product(
+            range(len(instancia.conflictos_trabajadores)),
+            range(instancia.cantidad_ordenes)):
+        nombres[instancia._indices_Tc_pj[p][j]] = "T_{}_{}".format(p, j)
     
     lb = [0] * instancia._total_variables
     ub = [1] * instancia._total_variables
@@ -205,6 +233,7 @@ def agregar_variables(prob, instancia):
 
     for i, r in itertools.product(range(instancia.cantidad_trabajadores), range(4)):
         types[instancia._indices_x_ir[i][r]] = "I"
+    
 
     # Agregar las variables
     prob.variables.add(obj = coeficientes_funcion_objetivo, lb = lb, ub = ub, types=types, names=nombres)
@@ -245,7 +274,6 @@ def agregar_restricciones(prob, instancia):
         rhs.append(1)
         names.append(f"Trabajador {i} trabaja en la orden {j} a lo sumo un dia")
 
-    #AGREGAR AL MODELO. Ver si se puede simplificar
     for i, (j1, j2), d, k in itertools.product(
         range(instancia.cantidad_trabajadores),
         itertools.combinations(range(instancia.cantidad_ordenes), 2),
@@ -446,6 +474,43 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Restriccion cuarto tramo funcion de costo trabajador {i}")
 
+    if instancia.penalizacion_conflicto > 0:
+        for p, j, d in itertools.product(
+                range(len(instancia.conflictos_trabajadores)),
+                range(instancia.cantidad_ordenes),
+                range(6)
+            ):
+                i1, i2 = instancia.conflictos_trabajadores[p]
+                indices = [
+                    instancia._indices_Tc_pj[p][j],
+                    instancia._indices_A_ijd[i1][j][d],
+                    instancia._indices_A_ijd[i2][j][d],
+                ]
+                valores = [2, -1, -1]
+                fila = [indices,valores]
+                filas.append(fila)
+                senses.append('L')
+                rhs.append(0)
+                names.append(f"Activación T_{p}_{j} ({i1} - {i2}) (i)")
+
+        for p, j, d in itertools.product(
+            range(len(instancia.conflictos_trabajadores)),
+            range(instancia.cantidad_ordenes),
+            range(6)
+        ):
+            i1, i2 = instancia.conflictos_trabajadores[p]
+            indices = [
+                instancia._indices_Tc_pj[p][j],
+                instancia._indices_A_ijd[i1][j][d],
+                instancia._indices_A_ijd[i2][j][d],
+            ]
+            valores = [1, 1, -1]
+            fila = [indices,valores]
+            filas.append(fila)
+            senses.append('L')
+            rhs.append(1)
+            names.append(f"Activación T_{p}_{j} ({i1} - {i2}) (ii)")
+
     # Restricción adicional 1 
     if instancia.activar_restriccion_opcional_1:
         for (i1,i2), j, d in itertools.product(
@@ -465,6 +530,7 @@ def agregar_restricciones(prob, instancia):
             names.append(f"Trabajador {i1} y trabajador {i2} no trabajan en una misma orden si estan conflictuados")
 
     # Restricción adicional 2
+    
     if instancia.activar_restriccion_opcional_2:
         for i, (j1,j2) in itertools.product(
             range(instancia.cantidad_trabajadores),
@@ -480,6 +546,7 @@ def agregar_restricciones(prob, instancia):
             senses.append('L')
             rhs.append(1)
             names.append(f"Trabajador {i} no trabaja en las ordenes {j1} y {j2} si son repetitivas")
+
 
     prob.linear_constraints.add(lin_expr=filas, senses=senses, rhs=rhs, names=names)
 
