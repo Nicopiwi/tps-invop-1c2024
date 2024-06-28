@@ -17,11 +17,11 @@ class InstanciaAsignacionCuadrillas:
         seleccion_variable = None,
         heuristica_primal = None,
         preproceso = None,
-        penalizacion_conflicto = 0
+        penalizacion_conflicto = int(0)
     ):
         self.activar_restriccion_opcional_1 = activar_restriccion_opcional_1
         self.activar_restriccion_opcional_2 = activar_restriccion_opcional_2
-        self.penalizacion_conflicto = penalizacion_conflicto
+        self.penalizacion_conflicto = int(penalizacion_conflicto)
         self.seleccion_nodo = seleccion_nodo
         self.seleccion_variable = seleccion_variable
         self.tolerancia = tolerancia
@@ -43,8 +43,8 @@ class InstanciaAsignacionCuadrillas:
         self._indices_w_ir = [] # 3 * T variables. Representa si el tramo r del trabajador i es activado
         self._indices_Tc_pj = []
         self._total_variables = 0
-
         self.tiempo_de_computo = 0
+        self.funcion_objetivo = 0
         
     def leer_datos(self,nombre_archivo):
 
@@ -141,12 +141,6 @@ class InstanciaAsignacionCuadrillas:
 
         self._total_variables = indice_comienzo + len(self.conflictos_trabajadores) * self.cantidad_ordenes
 
-        print(
-            self.cantidad_ordenes, self.conflictos_trabajadores
-        )
-        print(self._total_variables)
-        print(self._indices_Tc_pj)
-
 def cargar_instancia():
     # El 1er parametro es el nombre del archivo de entrada 	
     nombre_archivo = sys.argv[1].strip()
@@ -164,7 +158,8 @@ def cargar_instancia_con_configuracion(
     seleccion_nodo = None,
     seleccion_variable = None,
     heuristica_primal = None,
-    preproceso = None
+    preproceso = None,
+    penalizacion_conflicto = 0
 ):
     instancia = InstanciaAsignacionCuadrillas(
         activar_restriccion_opcional_1 = activar_restriccion_opcional_1,
@@ -173,7 +168,8 @@ def cargar_instancia_con_configuracion(
         seleccion_nodo = seleccion_nodo,
         seleccion_variable = seleccion_variable,
         heuristica_primal = heuristica_primal,
-        preproceso = preproceso
+        preproceso = preproceso,
+        penalizacion_conflicto= penalizacion_conflicto
     )
     instancia.leer_datos(path)
     return instancia
@@ -191,10 +187,9 @@ def agregar_variables(prob, instancia):
         coeficientes_funcion_objetivo[instancia._indices_x_ir[i][2]] = -1400
         coeficientes_funcion_objetivo[instancia._indices_x_ir[i][3]] = -1500
 
-    print(list(itertools.product(range(len(instancia.conflictos_trabajadores)), range(instancia.cantidad_ordenes))))
     
     for p, j in itertools.product(range(len(instancia.conflictos_trabajadores)), range(instancia.cantidad_ordenes)):
-        coeficientes_funcion_objetivo[instancia._indices_Tc_pj[p][j]] = instancia.penalizacion_conflicto
+        coeficientes_funcion_objetivo[instancia._indices_Tc_pj[p][j]] = -instancia.penalizacion_conflicto
 
     # Ponemos nombre a las variables
     nombres = [""] * instancia._total_variables
@@ -475,23 +470,23 @@ def agregar_restricciones(prob, instancia):
         names.append(f"Restriccion cuarto tramo funcion de costo trabajador {i}")
 
     if instancia.penalizacion_conflicto > 0:
-        for p, j, d in itertools.product(
-                range(len(instancia.conflictos_trabajadores)),
-                range(instancia.cantidad_ordenes),
-                range(6)
-            ):
-                i1, i2 = instancia.conflictos_trabajadores[p]
-                indices = [
-                    instancia._indices_Tc_pj[p][j],
-                    instancia._indices_A_ijd[i1][j][d],
-                    instancia._indices_A_ijd[i2][j][d],
-                ]
-                valores = [2, -1, -1]
-                fila = [indices,valores]
-                filas.append(fila)
-                senses.append('L')
-                rhs.append(0)
-                names.append(f"Activación T_{p}_{j} ({i1} - {i2}) (i)")
+        # for p, j, d in itertools.product(
+        #         range(len(instancia.conflictos_trabajadores)),
+        #         range(instancia.cantidad_ordenes),
+        #         range(6)
+        #     ):
+        #         i1, i2 = instancia.conflictos_trabajadores[p]
+        #         indices = [
+        #             instancia._indices_Tc_pj[p][j],
+        #             instancia._indices_A_ijd[i1][j][d],
+        #             instancia._indices_A_ijd[i2][j][d],
+        #         ]
+        #         valores = [2, -1, -1]
+        #         fila = [indices,valores]
+        #         filas.append(fila)
+        #         senses.append('L')
+        #         rhs.append(0)
+        #         names.append(f"Activación T_{p}_{j} ({i1} - {i2}) (i)")
 
         for p, j, d in itertools.product(
             range(len(instancia.conflictos_trabajadores)),
@@ -502,9 +497,9 @@ def agregar_restricciones(prob, instancia):
             indices = [
                 instancia._indices_Tc_pj[p][j],
                 instancia._indices_A_ijd[i1][j][d],
-                instancia._indices_A_ijd[i2][j][d],
+                instancia._indices_A_ijd[i2][j][d]
             ]
-            valores = [1, 1, -1]
+            valores = [-1, 1, 1]
             fila = [indices,valores]
             filas.append(fila)
             senses.append('L')
@@ -588,6 +583,7 @@ def resolver_lp(prob, instancia):
 
     end_time = prob.get_time()
     instancia.tiempo_de_computo = end_time - start_time
+    instancia.funcion_objetivo = prob.solution.get_objective_value()
     
 
 # Obtener informacion de la solucion a traves de 'solution'
