@@ -259,7 +259,6 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Orden {j} respeta cantidad de trabajadores, si se realiza")
 
-    # AGREGAR AL MODELO
     for i, j in itertools.product(range(instancia.cantidad_trabajadores), range(instancia.cantidad_ordenes)):
         indices = np.reshape(np.array(instancia._indices_A_ijd)[i, j, :], newshape=-1).tolist()
         valores = [1] * 6
@@ -470,24 +469,6 @@ def agregar_restricciones(prob, instancia):
         names.append(f"Restriccion cuarto tramo funcion de costo trabajador {i}")
 
     if instancia.penalizacion_conflicto > 0:
-        # for p, j, d in itertools.product(
-        #         range(len(instancia.conflictos_trabajadores)),
-        #         range(instancia.cantidad_ordenes),
-        #         range(6)
-        #     ):
-        #         i1, i2 = instancia.conflictos_trabajadores[p]
-        #         indices = [
-        #             instancia._indices_Tc_pj[p][j],
-        #             instancia._indices_A_ijd[i1][j][d],
-        #             instancia._indices_A_ijd[i2][j][d],
-        #         ]
-        #         valores = [2, -1, -1]
-        #         fila = [indices,valores]
-        #         filas.append(fila)
-        #         senses.append('L')
-        #         rhs.append(0)
-        #         names.append(f"Activación T_{p}_{j} ({i1} - {i2}) (i)")
-
         for p, j, d in itertools.product(
             range(len(instancia.conflictos_trabajadores)),
             range(instancia.cantidad_ordenes),
@@ -504,7 +485,7 @@ def agregar_restricciones(prob, instancia):
             filas.append(fila)
             senses.append('L')
             rhs.append(1)
-            names.append(f"Activación T_{p}_{j} ({i1} - {i2}) (ii)")
+            names.append(f"Activación Tc_{p}_{j} ({i1} - {i2})")
 
     # Restricción adicional 1 
     if instancia.activar_restriccion_opcional_1:
@@ -558,7 +539,7 @@ def armar_lp(prob, instancia, shouldWrite = True):
 
     # Escribir el lp a archivo
     if shouldWrite:
-        prob.write('asignacionCuadrillas3.lp')
+        prob.write('asignacionCuadrillas.lp')
 
 def resolver_lp(prob, instancia):
     # Definir los parametros del solver
