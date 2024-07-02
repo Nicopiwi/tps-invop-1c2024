@@ -382,22 +382,20 @@ def agregar_restricciones(prob, instancia):
         rhs.append(0)
         names.append(f"Si {j1} en {k}, entonces {j2} en {k+1}")
     
-    #n
 
-    for (j1, j2), d in itertools.product(
+    for (j1, _), d in itertools.product(
         instancia.ordenes_correlativas, 
         range(6)
         ):
         indices = [
             instancia._indices_B_jdk[j1][d][4],
-            instancia._indices_B_jdk[j2][d][4]
         ]
-        valores = [1, 1]
+        valores = [1]
         fila = [indices,valores]
         filas.append(fila)
-        senses.append('L')
+        senses.append('E')
         rhs.append(0)
-        names.append(f" {j1} y {j2} no pueden estar en el ultimo turno")
+        names.append(f" {j1} no puede estar en el ultimo turno")
     
 
     for (i1, i2) in itertools.combinations(range(instancia.cantidad_trabajadores), 2):
